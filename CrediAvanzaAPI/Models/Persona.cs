@@ -21,7 +21,9 @@ public partial class Persona
 
     public string CNombres { get; set; } = null!;
 
-    public string CSegundoApellido { get; set; } = null!;
+    public string CPrimerApellido { get; set; } = null!;
+
+    public string? CSegundoApellido { get; set; }
 
     public int NSexo { get; set; }
 
@@ -39,7 +41,7 @@ public partial class Persona
 
     public int NEscolaridad { get; set; }
 
-    public string CCorreo { get; set; } = null!;
+    public string? CCorreo { get; set; }
 
     public int IdFotoDocumento { get; set; }
 }

@@ -7,7 +7,8 @@ namespace CrediAvanzaAPI.Services
         Task<int> CrearSolicitudAsync(
              Foto foto,
              Persona persona,
-             Compra compra,
+             Compra compra, 
+             Conyuge conyuge,
              Documentacion documentacion,
              Fiador fiador,
              Garantium garantia,

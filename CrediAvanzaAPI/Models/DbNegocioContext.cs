@@ -19,6 +19,8 @@ public partial class DbNegocioContext : DbContext
 
     public virtual DbSet<Compra> Compras { get; set; }
 
+    public virtual DbSet<Conyuge> Conyuges { get; set; }
+
     public virtual DbSet<CredCalenGasto> CredCalenGastos { get; set; }
 
     public virtual DbSet<CredCalendCond> CredCalendConds { get; set; }
@@ -78,6 +80,39 @@ public partial class DbNegocioContext : DbContext
                 .HasColumnType("money")
                 .HasColumnName("nPrecioXUnidad");
             entity.Property(e => e.NUnidadMedida).HasColumnName("nUnidadMedida");
+        });
+
+        modelBuilder.Entity<Conyuge>(entity =>
+        {
+            entity.HasKey(e => e.IdConyuge);
+
+            entity.ToTable("Conyuge");
+
+            entity.Property(e => e.CCelular)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasColumnName("cCelular");
+            entity.Property(e => e.CDocumento)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasColumnName("cDocumento");
+            entity.Property(e => e.CNombres)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasColumnName("cNombres");
+            entity.Property(e => e.CPrimerApellido)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasColumnName("cPrimerApellido");
+            entity.Property(e => e.CSegundoApellido)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasColumnName("cSegundoApellido");
+            entity.Property(e => e.CTelefono)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasColumnName("cTelefono");
+            entity.Property(e => e.NTipoDocumento).HasColumnName("nTipoDocumento");
         });
 
         modelBuilder.Entity<CredCalenGasto>(entity =>
@@ -283,11 +318,8 @@ public partial class DbNegocioContext : DbContext
         {
             entity.HasKey(e => e.IdGarantia);
 
-            entity.Property(e => e.IdGarantia).ValueGeneratedNever();
             entity.Property(e => e.NIdArticuloGarantia).HasColumnName("nIdArticuloGarantia");
-            entity.Property(e => e.NIdFotoGarantia)
-                .ValueGeneratedOnAdd()
-                .HasColumnName("nIdFotoGarantia");
+            entity.Property(e => e.NIdFotoGarantia).HasColumnName("nIdFotoGarantia");
             entity.Property(e => e.NValor)
                 .HasColumnType("money")
                 .HasColumnName("nValor");
@@ -299,7 +331,6 @@ public partial class DbNegocioContext : DbContext
 
             entity.ToTable("Persona");
 
-            entity.Property(e => e.IdPersona).ValueGeneratedNever();
             entity.Property(e => e.CCorreo)
                 .HasMaxLength(50)
                 .IsUnicode(false)
@@ -312,6 +343,10 @@ public partial class DbNegocioContext : DbContext
                 .HasMaxLength(50)
                 .IsUnicode(false)
                 .HasColumnName("cNombres");
+            entity.Property(e => e.CPrimerApellido)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasColumnName("cPrimerApellido");
             entity.Property(e => e.CSegundoApellido)
                 .HasMaxLength(50)
                 .IsUnicode(false)

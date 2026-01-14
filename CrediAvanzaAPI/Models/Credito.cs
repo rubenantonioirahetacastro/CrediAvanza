@@ -47,6 +47,8 @@ public partial class Credito
 
     public int? IdCompra { get; set; }
 
+    public int? IdConyuge { get; set; }
+
     public int? IdVenta { get; set; }
 
     public int? IdDocumentacion { get; set; }
