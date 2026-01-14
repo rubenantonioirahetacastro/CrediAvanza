@@ -13,7 +13,8 @@ namespace CrediAvanzaAPI.Services
              Fiador fiador,
              Garantium garantia,
              Venta venta,
-             Credito credito
+             Credito credito,
+             Negocio negocio
          );
     }
 }

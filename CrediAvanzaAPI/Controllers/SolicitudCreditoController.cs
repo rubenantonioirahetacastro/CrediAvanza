@@ -21,7 +21,7 @@ namespace CrediAvanzaAPI.Controllers
         {
             var filas = await _service.CrearSolicitudAsync(
                 request.Foto, request.Persona, request.Compra, request.Conyuge, request.Documentacion, request.Fiador,
-                request.Garantia, request.Venta, request.Credito
+                request.Garantia, request.Venta, request.Credito , request.Negocio
             );
 
             return Ok(new { filasAfectadas = filas });

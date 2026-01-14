@@ -13,5 +13,6 @@ namespace CrediAvanzaAPI.Request
         public Garantium Garantia { get; set; }
         public Venta Venta { get; set; }
         public Credito Credito { get; set; }
+        public Negocio Negocio { get; set; }    
     }
 }

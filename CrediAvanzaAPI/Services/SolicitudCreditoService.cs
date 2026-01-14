@@ -12,13 +12,15 @@ namespace CrediAvanzaAPI.Services
         }
 
         public async Task<int> CrearSolicitudAsync(Foto foto, Persona persona, Compra compra, Conyuge conyuge, Documentacion documentacion,
-             Fiador fiador, Garantium garantium, Venta venta, Credito credito)
+             Fiador fiador, Garantium garantium, Venta venta, Credito credito, Negocio negocio)
         {
             await using var tx = await _context.Database.BeginTransactionAsync();
 
             try
             {
                 await _context.Fotos.AddAsync(foto);
+
+                persona.IdFotoDocumento = foto.IdFoto;
                 await _context.Personas.AddAsync(persona);
                 await _context.Compras.AddAsync(compra);
                 await _context.Conyuges.AddAsync(conyuge); 
@@ -26,10 +28,9 @@ namespace CrediAvanzaAPI.Services
                 await _context.Fiadors.AddAsync(fiador);
                 await _context.Garantia.AddAsync(garantium);
                 await _context.Ventas.AddAsync(venta);
+                await _context.Negocios.AddAsync(negocio);
 
                 await _context.SaveChangesAsync();
-
-                persona.IdFotoDocumento = foto.IdFoto;
 
                 credito.IdPersona = persona.IdPersona;
                 credito.IdCompra = compra.IdCompra;
@@ -38,6 +39,7 @@ namespace CrediAvanzaAPI.Services
                 credito.IdDocumentacion = documentacion.IdDocumento;
                 credito.IdGarantia = garantium.IdGarantia;
                 credito.IdFiador = fiador.IdFiador;
+                credito.IdNegocio = negocio.IdNegocio;
 
                 await _context.Creditos.AddAsync(credito);
                 int filasAfectadas = await _context.SaveChangesAsync();

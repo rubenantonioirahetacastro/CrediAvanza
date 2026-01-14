@@ -43,6 +43,8 @@ public partial class Credito
 
     public int? NCobroEnAgencia { get; set; }
 
+    public int? NAceptaTerminos { get; set; }
+
     public int? IdPersona { get; set; }
 
     public int? IdCompra { get; set; }
@@ -60,4 +62,6 @@ public partial class Credito
     public int? IdCalendario { get; set; }
 
     public int? IdCredCalendCond { get; set; }
+
+    public int? IdNegocio { get; set; }
 }

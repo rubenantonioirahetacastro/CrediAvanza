@@ -37,6 +37,8 @@ public partial class DbNegocioContext : DbContext
 
     public virtual DbSet<Garantium> Garantia { get; set; }
 
+    public virtual DbSet<Negocio> Negocios { get; set; }
+
     public virtual DbSet<Persona> Personas { get; set; }
 
     public virtual DbSet<Venta> Ventas { get; set; }
@@ -221,6 +223,7 @@ public partial class DbNegocioContext : DbContext
             entity.Property(e => e.DFecVig)
                 .HasColumnType("datetime")
                 .HasColumnName("dFecVig");
+            entity.Property(e => e.NAceptaTerminos).HasColumnName("nAceptaTerminos");
             entity.Property(e => e.NCiclo).HasColumnName("nCiclo");
             entity.Property(e => e.NCobroEnAgencia).HasColumnName("nCobroEnAgencia");
             entity.Property(e => e.NCodLinea).HasColumnName("nCodLinea");
@@ -323,6 +326,33 @@ public partial class DbNegocioContext : DbContext
             entity.Property(e => e.NValor)
                 .HasColumnType("money")
                 .HasColumnName("nValor");
+        });
+
+        modelBuilder.Entity<Negocio>(entity =>
+        {
+            entity.HasKey(e => e.IdNegocio);
+
+            entity.ToTable("Negocio");
+
+            entity.Property(e => e.CDireccion)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasColumnName("cDireccion");
+            entity.Property(e => e.CGeolocalizacion)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasColumnName("cGeolocalizacion");
+            entity.Property(e => e.CNombre)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasColumnName("cNombre");
+            entity.Property(e => e.CSector).HasColumnName("cSector");
+            entity.Property(e => e.CTelefono)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasColumnName("cTelefono");
+            entity.Property(e => e.THoraCierre).HasColumnName("tHoraCierre");
+            entity.Property(e => e.THoraInicio).HasColumnName("tHoraInicio");
         });
 
         modelBuilder.Entity<Persona>(entity =>
