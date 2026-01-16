@@ -11,8 +11,9 @@ namespace CrediAvanzaAPI.Services
             _context = context;
         }
 
-        public async Task<int> CrearSolicitudAsync(Foto foto, Persona persona, Compra compra, Conyuge conyuge, Documentacion documentacion,
-             Fiador fiador, Garantium garantium, Venta venta, Credito credito, Negocio negocio)
+        public async Task<int> CrearSolicitudAsync(Foto foto, Persona persona, Conyuge conyuge,
+            Documentacion documentacion,Fiador fiador, Garantium garantium,
+            Negocio negocio, List<Compra> compra, List<Venta> venta, Credito credito)
         {
             await using var tx = await _context.Database.BeginTransactionAsync();
 
@@ -23,22 +24,28 @@ namespace CrediAvanzaAPI.Services
 
                 persona.IdFotoDocumento = foto.IdFoto;
                 await _context.Personas.AddAsync(persona);
-                await _context.SaveChangesAsync();
-
-                await _context.Compras.AddAsync(compra);
                 await _context.Conyuges.AddAsync(conyuge); 
                 await _context.Documentacions.AddAsync(documentacion);
                 await _context.Fiadors.AddAsync(fiador);
                 await _context.Garantia.AddAsync(garantium);
-                await _context.Ventas.AddAsync(venta);
                 await _context.Negocios.AddAsync(negocio);
-
                 await _context.SaveChangesAsync();
 
+                foreach (var c in compra)
+                {
+                    c.IdNegocio = negocio.IdNegocio;
+                }
+
+                foreach (var v in venta)
+                {
+                    v.IdNegocio = negocio.IdNegocio;
+                }
+
+                await _context.Compras.AddRangeAsync(compra);
+                await _context.Ventas.AddRangeAsync(venta);
+
                 credito.IdPersona = persona.IdPersona;
-                credito.IdCompra = compra.IdCompra;
                 credito.IdConyuge = conyuge.IdConyuge;
-                credito.IdVenta = venta.IdVenta;
                 credito.IdDocumentacion = documentacion.IdDocumento;
                 credito.IdGarantia = garantium.IdGarantia;
                 credito.IdFiador = fiador.IdFiador;

@@ -19,8 +19,8 @@ namespace CrediAvanzaAPI.Services
         }
         public async Task<int> GenerarCalendarioAsync(int nCodCred)
         {
-            //var credito = await _context.Creditos.FirstOrDefaultAsync(x => x.NCodCred == nCodCred) ?? throw new Exception("Crédito no existe");
-            //var creditoRequest = credito.ToCreditoRequest();
+            var credito = await _context.Creditos.FirstOrDefaultAsync(x => x.NCodCred == nCodCred) ?? throw new Exception("Crédito no existe");
+            var creditoRequest = credito.ToCreditoRequest();
 
             //decimal nGastoPorCuota = await _gastoService.ObtenerGastoAsync(creditoRequest);
             //var oFeriados = await _feriadoService.ObtenerFeriadosAsync(fechaDesembolso,creditoRequest.nCodAge);

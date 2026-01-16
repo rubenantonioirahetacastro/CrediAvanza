@@ -16,4 +16,6 @@ public partial class Compra
     public decimal NPrecioXunidad { get; set; }
 
     public decimal NPrecioTotal { get; set; }
+
+    public int IdNegocio { get; set; }
 }

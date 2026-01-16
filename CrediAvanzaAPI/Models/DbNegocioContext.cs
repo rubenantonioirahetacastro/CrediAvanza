@@ -78,7 +78,7 @@ public partial class DbNegocioContext : DbContext
 
         modelBuilder.Entity<Compra>(entity =>
         {
-            entity.HasKey(e => e.IdCompra);
+            entity.HasKey(e => e.IdCompra).HasName("PK_CompraDetalle");
 
             entity.Property(e => e.CProducto)
                 .HasMaxLength(50)

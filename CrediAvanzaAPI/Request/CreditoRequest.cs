@@ -10,7 +10,6 @@
         public int nTipoCargo { get; set; }    
         public int nCobroEnAgencia { get; set; } 
         public int nCodCred { get; set; }
-
         public int nCodAge { get; set; }
     }
 }
