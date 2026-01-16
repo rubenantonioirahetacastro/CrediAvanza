@@ -23,6 +23,8 @@ public partial class Credito
 
     public int NEstado { get; set; }
 
+    public int NPeriodo { get; set; }
+
     public decimal? NMontoCuota { get; set; }
 
     public decimal? NTasaComp { get; set; }

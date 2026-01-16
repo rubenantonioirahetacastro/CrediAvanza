@@ -35,3 +35,5 @@ app.MapControllers();
 app.Run();
 
 // deploy inicial
+
+//Scaffold - DbContext "Server=crediavanzasv.database.windows.net;Database=DbNegocio;User Id=CloudAdmin;Password=Pepe2024;TrustServerCertificate=True;" Microsoft.EntityFrameworkCore.SqlServer - OutputDir Models - Context DbNegocioContext - Force

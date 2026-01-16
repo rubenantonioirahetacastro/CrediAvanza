@@ -19,9 +19,12 @@ namespace CrediAvanzaAPI.Services
             try
             {
                 await _context.Fotos.AddAsync(foto);
+                await _context.SaveChangesAsync();
 
                 persona.IdFotoDocumento = foto.IdFoto;
                 await _context.Personas.AddAsync(persona);
+                await _context.SaveChangesAsync();
+
                 await _context.Compras.AddAsync(compra);
                 await _context.Conyuges.AddAsync(conyuge); 
                 await _context.Documentacions.AddAsync(documentacion);
