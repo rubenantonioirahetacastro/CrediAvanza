@@ -9,7 +9,7 @@ namespace CrediAvanzaAPI.Services
     //Negocio negocio, List<Compra> compra, List<Venta> venta, Credito credito)
 
         Task<int> CrearSolicitudAsync(
-             Foto foto,
+             List<Foto> foto,
              Persona persona,
              Conyuge conyuge,
              Documentacion documentacion,

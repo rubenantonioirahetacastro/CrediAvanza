@@ -11,7 +11,7 @@ namespace CrediAvanzaAPI.Services
             _context = context;
         }
 
-        public async Task<int> CrearSolicitudAsync(Foto foto, Persona persona, Conyuge conyuge,
+        public async Task<int> CrearSolicitudAsync(List<Foto> foto, Persona persona, Conyuge conyuge,
             Documentacion documentacion,Fiador fiador, Garantium garantium,
             Negocio negocio, List<Compra> compra, List<Venta> venta, Credito credito)
         {
@@ -19,10 +19,6 @@ namespace CrediAvanzaAPI.Services
 
             try
             {
-                await _context.Fotos.AddAsync(foto);
-                await _context.SaveChangesAsync();
-
-                persona.IdFotoDocumento = foto.IdFoto;
                 await _context.Personas.AddAsync(persona);
                 await _context.Conyuges.AddAsync(conyuge); 
                 await _context.Documentacions.AddAsync(documentacion);
@@ -40,9 +36,14 @@ namespace CrediAvanzaAPI.Services
                 {
                     v.IdNegocio = negocio.IdNegocio;
                 }
+                foreach (var f in foto)
+                {
+                    f.IdPersona = persona.IdPersona;
+                }
 
                 await _context.Compras.AddRangeAsync(compra);
                 await _context.Ventas.AddRangeAsync(venta);
+                await _context.Fotos.AddRangeAsync(foto);
 
                 credito.IdPersona = persona.IdPersona;
                 credito.IdConyuge = conyuge.IdConyuge;

@@ -4,7 +4,7 @@ namespace CrediAvanzaAPI.Request
 {
     public class SolicitudCreditoRequest
     {
-        public Foto Foto { get; set; }
+        public List<Foto> Foto { get; set; }
         public Persona Persona { get; set; }
         public Conyuge Conyuge { get; set; }
         public Documentacion Documentacion { get; set; }

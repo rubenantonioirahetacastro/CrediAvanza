@@ -10,4 +10,6 @@ public partial class Foto
     public string VFoto { get; set; } = null!;
 
     public int NTipoFoto { get; set; }
+
+    public int IdPersona { get; set; }
 }

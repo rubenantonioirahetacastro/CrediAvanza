@@ -42,6 +42,4 @@ public partial class Persona
     public int NEscolaridad { get; set; }
 
     public string? CCorreo { get; set; }
-
-    public int IdFotoDocumento { get; set; }
 }
