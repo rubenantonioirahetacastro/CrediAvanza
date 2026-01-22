@@ -41,8 +41,11 @@ namespace CrediAvanzaAPI.Services
 
         public async Task<CatalogoCodigo?> GetCatalogoById(int id)
         {
-            return await _context.CatalogoCodigos.FindAsync(id);
+            return await _context.CatalogoCodigos
+                .AsNoTracking()
+                .FirstOrDefaultAsync(x => x.NCodigo == id);
         }
+
 
         public async Task<int> UpdateCatalogo(CatalogoCodigo catalogo)
         {

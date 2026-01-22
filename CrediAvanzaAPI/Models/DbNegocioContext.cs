@@ -61,19 +61,21 @@ public partial class DbNegocioContext : DbContext
     {
         modelBuilder.Entity<CatalogoCodigo>(entity =>
         {
-            entity.HasKey(e => new { e.NCodigo, e.NValor });
+            entity.HasKey(e => e.NCodigo).HasName("PK_CatalogoCodigos_1");
 
-            entity.Property(e => e.NCodigo).HasColumnName("nCodigo");
-            entity.Property(e => e.NValor)
-                .HasMaxLength(10)
-                .IsFixedLength()
-                .HasColumnName("nValor");
+            entity.Property(e => e.NCodigo)
+                .ValueGeneratedNever()
+                .HasColumnName("nCodigo");
             entity.Property(e => e.CNomCod)
                 .HasMaxLength(100)
                 .IsUnicode(false)
                 .HasColumnName("cNomCod");
             entity.Property(e => e.NEstados).HasColumnName("nEstados");
             entity.Property(e => e.NTipoCodigo).HasColumnName("nTipoCodigo");
+            entity.Property(e => e.NValor)
+                .HasMaxLength(10)
+                .IsFixedLength()
+                .HasColumnName("nValor");
         });
 
         modelBuilder.Entity<Compra>(entity =>
