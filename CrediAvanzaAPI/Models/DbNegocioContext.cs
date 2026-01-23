@@ -41,9 +41,15 @@ public partial class DbNegocioContext : DbContext
 
     public virtual DbSet<Fiador> Fiadors { get; set; }
 
-    public virtual DbSet<Foto> Fotos { get; set; }
+    public virtual DbSet<FotoDocumentacion> FotoDocumentacions { get; set; }
+
+    public virtual DbSet<FotoId> FotoIds { get; set; }
+
+    public virtual DbSet<FotoNegocio> FotoNegocios { get; set; }
 
     public virtual DbSet<Garantium> Garantia { get; set; }
+
+    public virtual DbSet<LogErrore> LogErrores { get; set; }
 
     public virtual DbSet<Negocio> Negocios { get; set; }
 
@@ -337,11 +343,9 @@ public partial class DbNegocioContext : DbContext
 
         modelBuilder.Entity<Documentacion>(entity =>
         {
-            entity.HasKey(e => e.IdDocumento);
+            entity.HasKey(e => e.IdDocumentacion);
 
             entity.ToTable("Documentacion");
-
-            entity.Property(e => e.NTipoDocumento).HasColumnName("nTipoDocumento");
         });
 
         modelBuilder.Entity<Fiador>(entity =>
@@ -381,11 +385,34 @@ public partial class DbNegocioContext : DbContext
             entity.Property(e => e.NTipoDocumento).HasColumnName("nTipoDocumento");
         });
 
-        modelBuilder.Entity<Foto>(entity =>
+        modelBuilder.Entity<FotoDocumentacion>(entity =>
+        {
+            entity.HasKey(e => e.IdFoto).HasName("PK_FotoDocumentacion_1");
+
+            entity.ToTable("FotoDocumentacion");
+
+            entity.Property(e => e.VFoto)
+                .IsUnicode(false)
+                .HasColumnName("vFoto");
+        });
+
+        modelBuilder.Entity<FotoId>(entity =>
+        {
+            entity.HasKey(e => e.IdFoto).HasName("PK_Foto");
+
+            entity.ToTable("FotoID");
+
+            entity.Property(e => e.NTipoFoto).HasColumnName("nTipoFoto");
+            entity.Property(e => e.VFoto)
+                .IsUnicode(false)
+                .HasColumnName("vFoto");
+        });
+
+        modelBuilder.Entity<FotoNegocio>(entity =>
         {
             entity.HasKey(e => e.IdFoto);
 
-            entity.ToTable("Foto");
+            entity.ToTable("FotoNegocio");
 
             entity.Property(e => e.NTipoFoto).HasColumnName("nTipoFoto");
             entity.Property(e => e.VFoto)
@@ -402,6 +429,28 @@ public partial class DbNegocioContext : DbContext
             entity.Property(e => e.NValor)
                 .HasColumnType("money")
                 .HasColumnName("nValor");
+        });
+
+        modelBuilder.Entity<LogErrore>(entity =>
+        {
+            entity.HasKey(e => e.IdLogError).HasName("PK__LogError__7B1F940EA93C6869");
+
+            entity.Property(e => e.FechaError)
+                .HasDefaultValueSql("(getdate())")
+                .HasColumnType("datetime");
+            entity.Property(e => e.Ip)
+                .HasMaxLength(45)
+                .IsUnicode(false)
+                .HasColumnName("IP");
+            entity.Property(e => e.Origen)
+                .HasMaxLength(100)
+                .IsUnicode(false);
+            entity.Property(e => e.TipoExcepcion)
+                .HasMaxLength(200)
+                .IsUnicode(false);
+            entity.Property(e => e.Usuario)
+                .HasMaxLength(100)
+                .IsUnicode(false);
         });
 
         modelBuilder.Entity<Negocio>(entity =>

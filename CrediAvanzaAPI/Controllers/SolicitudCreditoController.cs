@@ -1,4 +1,5 @@
-﻿using CrediAvanzaAPI.Request;
+﻿using CrediAvanzaAPI.Models;
+using CrediAvanzaAPI.Request;
 using CrediAvanzaAPI.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -20,7 +21,7 @@ namespace CrediAvanzaAPI.Controllers
         public async Task<IActionResult> Crear([FromBody] SolicitudCreditoRequest request)
         {
             var filas = await _service.CrearSolicitudAsync(
-                request.Foto, request.Persona, request.Conyuge, request.Documentacion, request.Fiador,
+                request.FotoIds, request.FotoDocumentacions, request.FotoNegocios, request.Persona, request.Conyuge, request.Fiador,
                 request.Garantia, request.Negocio, request.Compra, request.Venta, request.Credito
             );
 
