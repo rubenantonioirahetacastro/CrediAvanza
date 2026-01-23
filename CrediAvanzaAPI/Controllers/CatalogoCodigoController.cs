@@ -18,15 +18,20 @@ namespace CrediAvanzaAPI.Controllers
         [HttpPost]
         public async Task<IActionResult> AddCatalogo([FromBody] Models.CatalogoCodigo catalogo)
         {
-            if (catalogo == null)
-                return BadRequest("El catálogo es inválido");
+            try
+            {
+                await _catalogoCodigoService.AddCatalogo(catalogo);
 
-            var result = await _catalogoCodigoService.AddCatalogo(catalogo);
-
-            if (result == 0)
-                return BadRequest("No se pudo guardar el catálogo");
-
-            return CreatedAtAction(nameof(GetCatalogoById), new { id = catalogo.NCodigo }, catalogo);
+                return CreatedAtAction(
+                    nameof(GetCatalogoById),
+                    new { codigo = catalogo.NCodigo },
+                    catalogo
+                );
+            }
+            catch (InvalidOperationException ex)
+            {
+                return Conflict(ex.Message);
+            }
         }
 
         [HttpGet]
@@ -36,40 +41,37 @@ namespace CrediAvanzaAPI.Controllers
             return Ok(catalogos);
         }
 
-        [HttpGet("{id}")]
-        public async Task<IActionResult> GetCatalogoById(int id)
+        [HttpGet("{codigo}")]
+        public async Task<IActionResult> GetCatalogoById(int codigo)
         {
-            var catalogo = await _catalogoCodigoService.GetCatalogoById(id);
+            var catalogos = await _catalogoCodigoService.GetCatalogoById(codigo);
 
-            if (catalogo == null)
-                return NotFound();
+            if (catalogos == null || !catalogos.Any())
+                return NotFound("No existen valores para este catálogo");
 
-            return Ok(catalogo);
+            return Ok(catalogos);
         }
 
         [HttpPut]
         public async Task<IActionResult> UpdateCatalogo([FromBody] Models.CatalogoCodigo catalogo)
         {
-            if (catalogo == null)
-                return BadRequest();
+            var updated = await _catalogoCodigoService.UpdateCatalogo(catalogo);
 
-            var result = await _catalogoCodigoService.UpdateCatalogo(catalogo);
-
-            if (result == 0)
+            if (!updated)
                 return NotFound("El catálogo no existe");
 
-            return Ok(result);
+            return NoContent(); // 204
         }
 
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteCatalogo(int id)
+        [HttpDelete("{codigo}/{valor}")]
+        public async Task<IActionResult> DeleteCatalogo(int codigo, int valor)
         {
-            var result = await _catalogoCodigoService.DeleteCatalogo(id);
+            var deleted = await _catalogoCodigoService.DeleteCatalogo(codigo, valor);
 
-            if (result == 0)
+            if (!deleted)
                 return NotFound();
 
-            return Ok(result);
+            return NoContent();
         }
     }
 }

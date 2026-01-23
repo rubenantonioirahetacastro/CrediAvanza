@@ -5,9 +5,9 @@ namespace CrediAvanzaAPI.Services
     public interface ICatalogoCodigoService
     {
         Task<List<CatalogoCodigo>> AllCatalogos();
-        Task<int> AddCatalogo(CatalogoCodigo catalogo);
-        Task<int> UpdateCatalogo(CatalogoCodigo catalogo);
-        Task<int> DeleteCatalogo(int id);
-        Task<CatalogoCodigo?> GetCatalogoById(int id);
+        Task<bool> AddCatalogo(CatalogoCodigo catalogo);
+        Task<bool> UpdateCatalogo(CatalogoCodigo catalogo);
+        Task<bool> DeleteCatalogo(int nCodigo, int nValor);
+        Task<List<CatalogoCodigo>> GetCatalogoById(int nCodigo);
     }
 }

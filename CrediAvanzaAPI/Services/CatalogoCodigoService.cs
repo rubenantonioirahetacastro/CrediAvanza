@@ -13,48 +13,79 @@ namespace CrediAvanzaAPI.Services
             _dbSet = _context.Set<CatalogoCodigo>();
         }
 
-        public async Task<int> AddCatalogo(CatalogoCodigo catalogo)
+        public async Task<bool> AddCatalogo(CatalogoCodigo catalogo)
         {
             if (catalogo == null)
-                return 0;
+                throw new ArgumentNullException(nameof(catalogo));
 
-            await _dbSet.AddAsync(catalogo);
-            return await _context.SaveChangesAsync();
+            var existe = await _context.CatalogoCodigos.AnyAsync(x =>
+                x.NCodigo == catalogo.NCodigo &&
+                x.NValor == catalogo.NValor);
+
+            if (existe)
+                throw new InvalidOperationException(
+                    $"Ya existe el valor {catalogo.NValor} para el catálogo {catalogo.NCodigo}"
+                );
+
+            await _context.CatalogoCodigos.AddAsync(catalogo);
+            await _context.SaveChangesAsync();
+
+            return true;
         }
-
 
         public async Task<List<CatalogoCodigo>> AllCatalogos()
         {
             return await _dbSet.ToListAsync();
         }
 
-        public async Task<int> DeleteCatalogo(int id)
-        {
-            var catalogo = await _context.CatalogoCodigos.FindAsync(id);
-            if (catalogo == null)
-            {
-                return 0;
-            }
-            _context.CatalogoCodigos.Remove(catalogo);
-            return await _context.SaveChangesAsync();
-        }
-
-        public async Task<CatalogoCodigo?> GetCatalogoById(int id)
+        public async Task<CatalogoCodigo?> GetByKeyAsync(int nCodigo, int nValor)
         {
             return await _context.CatalogoCodigos
-                .AsNoTracking()
-                .FirstOrDefaultAsync(x => x.NCodigo == id);
+                .FirstOrDefaultAsync(x => x.NCodigo == nCodigo && x.NValor == nValor);
+        }
+
+        public async Task<bool> DeleteCatalogo(int nCodigo, int nValor)
+        {
+            var entity = await GetByKeyAsync(nCodigo, nValor);
+
+            if (entity == null)
+                return false;
+
+            _context.CatalogoCodigos.Remove(entity);
+            await _context.SaveChangesAsync();
+
+            return true;
+        }
+
+        public async Task<List<CatalogoCodigo>> GetCatalogoById(int nCodigo)
+        {
+            return await _context.CatalogoCodigos
+               .Where(x => x.NCodigo == nCodigo)
+               .OrderBy(x => x.NValor)
+               .ToListAsync();
         }
 
 
-        public async Task<int> UpdateCatalogo(CatalogoCodigo catalogo)
+        public async Task<bool> UpdateCatalogo(CatalogoCodigo catalogo)
         {
-            var existe = await _dbSet.AnyAsync(x => x.NCodigo == catalogo.NCodigo);
-            if (!existe)
-                return 0;
+            if (catalogo == null)
+                throw new ArgumentNullException(nameof(catalogo));
 
-            _dbSet.Update(catalogo);
-            return await _context.SaveChangesAsync();
+            var existente = await _context.CatalogoCodigos
+                .FirstOrDefaultAsync(x =>
+                    x.NCodigo == catalogo.NCodigo &&
+                    x.NValor == catalogo.NValor);
+
+            if (existente == null)
+                return false;
+
+            //NO tocar la PK
+            existente.CNomCod = catalogo.CNomCod;
+            existente.NEstados = catalogo.NEstados;
+            existente.NTipoCodigo = catalogo.NTipoCodigo;
+
+            await _context.SaveChangesAsync();
+            return true;
         }
 
     }
