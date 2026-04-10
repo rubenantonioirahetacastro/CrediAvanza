@@ -21,6 +21,9 @@ public partial class CredCalendario
 
     public decimal NIgv { get; set; }
 
+    [System.ComponentModel.DataAnnotations.Schema.NotMapped]
+    public decimal nTotalCuota { get; set; }
+
     public decimal NCapPag { get; set; }
 
     public decimal NIntPag { get; set; }

@@ -11,5 +11,6 @@
         public int nCobroEnAgencia { get; set; } 
         public int nCodCred { get; set; }
         public int nCodAge { get; set; }
+        public DateTime fechaDesembolso { get; set; }
     }
 }

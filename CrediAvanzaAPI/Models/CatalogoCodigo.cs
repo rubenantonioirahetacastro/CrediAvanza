@@ -7,9 +7,9 @@ public partial class CatalogoCodigo
 {
     public int NCodigo { get; set; }
 
-    public string CNomCod { get; set; } = null!;
-
     public int NValor { get; set; }
+
+    public string CNomCod { get; set; } = null!;
 
     public int? NEstados { get; set; }
 

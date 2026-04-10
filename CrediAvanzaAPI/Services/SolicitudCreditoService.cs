@@ -4,34 +4,25 @@ using System;
 
 namespace CrediAvanzaAPI.Services
 {
-    public class SolicitudCreditoService : ISolicitudCreditoService
+    public class SolicitudCreditoService(DbNegocioContext context, ErrorLogger errorLogger) : ISolicitudCreditoService
     {
-        private readonly DbNegocioContext _context;
-        private readonly ErrorLogger _errorLogger;
-
-        public SolicitudCreditoService(DbNegocioContext context, ErrorLogger errorLogger)
-        {
-            _context = context;
-            _errorLogger = errorLogger;
-        }
-
         public async Task<int> CrearSolicitudAsync(List<FotoId> fotoId, List<FotoDocumentacion> fotoDocumentacion, 
             List<FotoNegocio> fotoNegocio, Persona persona, Conyuge conyuge,
             Fiador fiador, Garantium garantium,
             Negocio negocio, List<Compra> compra, List<Venta> venta, Credito credito)
         {
-            await using var tx = await _context.Database.BeginTransactionAsync();
+            await using var tx = await context.Database.BeginTransactionAsync();
 
             try
             {
-                await _context.Personas.AddAsync(persona);
-                await _context.Conyuges.AddAsync(conyuge); 
-                await _context.Fiadors.AddAsync(fiador);
-                await _context.Garantia.AddAsync(garantium);
-                await _context.Negocios.AddAsync(negocio);
+                await context.Personas.AddAsync(persona);
+                await context.Conyuges.AddAsync(conyuge); 
+                await context.Fiadors.AddAsync(fiador);
+                await context.Garantia.AddAsync(garantium);
+                await context.Negocios.AddAsync(negocio);
                 var documentacion = new Documentacion();
-                await _context.Documentacions.AddAsync(documentacion);
-                await _context.SaveChangesAsync();
+                await context.Documentacions.AddAsync(documentacion);
+                await context.SaveChangesAsync();
 
                 compra.ForEach(c => c.IdNegocio = negocio.IdNegocio);
                 venta.ForEach(v => v.IdNegocio = negocio.IdNegocio);
@@ -39,11 +30,11 @@ namespace CrediAvanzaAPI.Services
                 fotoDocumentacion.ForEach(f => f.IdDocumentacion = documentacion.IdDocumentacion);
                 fotoNegocio.ForEach(f => f.IdNegocio = negocio.IdNegocio);
 
-                await _context.Compras.AddRangeAsync(compra);
-                await _context.Ventas.AddRangeAsync(venta);
-                await _context.FotoIds.AddRangeAsync(fotoId);
-                await _context.FotoDocumentacions.AddRangeAsync(fotoDocumentacion);
-                await _context.FotoNegocios.AddRangeAsync(fotoNegocio);
+                await context.Compras.AddRangeAsync(compra);
+                await context.Ventas.AddRangeAsync(venta);
+                await context.FotoIds.AddRangeAsync(fotoId);
+                await context.FotoDocumentacions.AddRangeAsync(fotoDocumentacion);
+                await context.FotoNegocios.AddRangeAsync(fotoNegocio);
 
                 credito.IdPersona = persona.IdPersona;
                 credito.IdConyuge = conyuge.IdConyuge;
@@ -52,8 +43,8 @@ namespace CrediAvanzaAPI.Services
                 credito.IdFiador = fiador.IdFiador;
                 credito.IdNegocio = negocio.IdNegocio;
 
-                await _context.Creditos.AddAsync(credito);
-                int filasAfectadas = await _context.SaveChangesAsync();
+                await context.Creditos.AddAsync(credito);
+                int filasAfectadas = await context.SaveChangesAsync();
 
                 await tx.CommitAsync();
                 return filasAfectadas;
@@ -61,7 +52,7 @@ namespace CrediAvanzaAPI.Services
             catch (Exception ex)
             {
                 await tx.RollbackAsync();
-                await _errorLogger.LogAsync(ex);
+                await errorLogger.LogAsync(ex);
                 throw;
             }
         }

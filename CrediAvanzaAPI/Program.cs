@@ -8,6 +8,9 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddScoped<ISolicitudCreditoService, SolicitudCreditoService>();
 builder.Services.AddScoped<ICatalogoCodigoService, CatalogoCodigoService>();
+builder.Services.AddScoped<ICalendarioService, CalendarioService>();
+builder.Services.AddScoped<IFeriadoService, FeriadoService>();
+builder.Services.AddScoped<IGastoService, GastoService>();
 builder.Services.AddScoped<ErrorLogger>();
 
 builder.Services.AddControllers();
@@ -38,3 +41,4 @@ app.Run();
 // deploy inicial
 
 //Scaffold - DbContext "Server=crediavanzasv.database.windows.net;Database=DbNegocio;User Id=CloudAdmin;Password=Pepe2024;TrustServerCertificate=True;" Microsoft.EntityFrameworkCore.SqlServer - OutputDir Models - Context DbNegocioContext - Force
+//Scaffold - DbContext "Server=DESKTOP-KTHL7K7\SQLEXPRESS;Database=DbNegocio;Trusted_Connection=True;MultipleActiveResultSets=true;TrustServerCertificate=True" Microsoft.EntityFrameworkCore.SqlServer - OutputDir Models - Context DbNegocioContext - Force

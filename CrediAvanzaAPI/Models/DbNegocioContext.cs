@@ -15,6 +15,8 @@ public partial class DbNegocioContext : DbContext
     {
     }
 
+    public virtual DbSet<Agencia> Agencias { get; set; }
+
     public virtual DbSet<CatalogoCodigo> CatalogoCodigos { get; set; }
 
     public virtual DbSet<Compra> Compras { get; set; }
@@ -34,6 +36,8 @@ public partial class DbNegocioContext : DbContext
     public virtual DbSet<CredFeriadoAge> CredFeriadoAges { get; set; }
 
     public virtual DbSet<CredGasto> CredGastos { get; set; }
+
+    public virtual DbSet<CredLineaCredito> CredLineaCreditos { get; set; }
 
     public virtual DbSet<Credito> Creditos { get; set; }
 
@@ -61,10 +65,35 @@ public partial class DbNegocioContext : DbContext
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see https://go.microsoft.com/fwlink/?LinkId=723263.
-        => optionsBuilder.UseSqlServer("Server=crediavanzasv.database.windows.net;Database=DbNegocio;User Id=CloudAdmin;Password=Pepe2024;TrustServerCertificate=True;");
+        => optionsBuilder.UseSqlServer("Server=DESKTOP-KTHL7K7\\SQLEXPRESS;Database=DbNegocio;Trusted_Connection=True;MultipleActiveResultSets=true;TrustServerCertificate=True");
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        modelBuilder.Entity<Agencia>(entity =>
+        {
+            entity.HasKey(e => e.NCodAge).HasName("PK__Agencias__771BAD3ED57349AF");
+
+            entity.Property(e => e.NCodAge)
+                .ValueGeneratedNever()
+                .HasColumnName("nCodAge");
+            entity.Property(e => e.CCorreoElectronico)
+                .HasMaxLength(100)
+                .IsUnicode(false)
+                .HasColumnName("cCorreoELectronico");
+            entity.Property(e => e.CDirecAge)
+                .HasMaxLength(200)
+                .IsUnicode(false)
+                .HasColumnName("cDirecAge");
+            entity.Property(e => e.CNomAge)
+                .HasMaxLength(100)
+                .IsUnicode(false)
+                .HasColumnName("cNomAge");
+            entity.Property(e => e.CTelefAge)
+                .HasMaxLength(20)
+                .IsUnicode(false)
+                .HasColumnName("cTelefAge");
+        });
+
         modelBuilder.Entity<CatalogoCodigo>(entity =>
         {
             entity.HasKey(e => new { e.NCodigo, e.NValor });
@@ -296,6 +325,35 @@ public partial class DbNegocioContext : DbContext
             entity.Property(e => e.NValor)
                 .HasColumnType("money")
                 .HasColumnName("nValor");
+        });
+
+        modelBuilder.Entity<CredLineaCredito>(entity =>
+        {
+            entity.HasKey(e => e.NCodLinea).HasName("PK__CredLine__50A988C3ABA5478A");
+
+            entity.ToTable("CredLineaCredito");
+
+            entity.Property(e => e.NCodLinea).HasColumnName("nCodLinea");
+            entity.Property(e => e.BEstado)
+                .HasDefaultValue(true)
+                .HasColumnName("bEstado");
+            entity.Property(e => e.CDescLinea)
+                .HasMaxLength(150)
+                .IsUnicode(false)
+                .HasColumnName("cDescLinea");
+            entity.Property(e => e.NMontoMax)
+                .HasColumnType("money")
+                .HasColumnName("nMontoMax");
+            entity.Property(e => e.NMontoMin)
+                .HasColumnType("money")
+                .HasColumnName("nMontoMin");
+            entity.Property(e => e.NPlazoMax).HasColumnName("nPlazoMax");
+            entity.Property(e => e.NPlazoMin).HasColumnName("nPlazoMin");
+            entity.Property(e => e.NProd).HasColumnName("nProd");
+            entity.Property(e => e.NSubProd).HasColumnName("nSubProd");
+            entity.Property(e => e.NTasaCom)
+                .HasColumnType("money")
+                .HasColumnName("nTasaCom");
         });
 
         modelBuilder.Entity<Credito>(entity =>
