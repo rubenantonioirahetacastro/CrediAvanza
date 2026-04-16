@@ -5,9 +5,9 @@ namespace CrediAvanzaAPI.Models;
 
 public partial class Credito
 {
-    public int NCodCred { get; set; }
-
     public int NCodAge { get; set; }
+
+    public int NCodCred { get; set; }
 
     public int NProd { get; set; }
 
@@ -33,13 +33,9 @@ public partial class Credito
 
     public int NNroCuotas { get; set; }
 
-    public int NNroProxCuota { get; set; }
-
     public decimal? NMora { get; set; }
 
     public int? NDiasAtraso { get; set; }
-
-    public int? NCiclo { get; set; }
 
     public decimal? NTasaComision { get; set; }
 
@@ -56,8 +52,6 @@ public partial class Credito
     public int? IdGarantia { get; set; }
 
     public int? IdFiador { get; set; }
-
-    public int? IdCalendario { get; set; }
 
     public int? IdCredCalendCond { get; set; }
 

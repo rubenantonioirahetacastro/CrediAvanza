@@ -44,7 +44,7 @@ namespace CrediAvanzaAPI.Controllers
                 if (nCodAge <= 0) return BadRequest("El código de agencia (nCodAge) es obligatorio.");
 
                 var calendarioSimulado = await _calendarioService.ProyectarCalendarioAsync(nCapital, nPlazo, nSubProd, nCodAge);
-                var cuotaEstimada = calendarioSimulado.FirstOrDefault()?.nTotalCuota ?? 0;
+                var cuotaEstimada = calendarioSimulado.FirstOrDefault()?.NTotalCuota ?? 0;
 
                 return Ok(new { CuotaEstimada = cuotaEstimada, Calendario = calendarioSimulado });
             }

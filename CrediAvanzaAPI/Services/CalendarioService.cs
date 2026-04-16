@@ -36,7 +36,7 @@ namespace CrediAvanzaAPI.Services
             decimal tasaIva = 0.13m; // Tasa de IVA
             decimal cuotaFijaEstimada = CalculadoraFinanciera.CalcularCuotaFijaEstimada(nCapital, nPlazo, nSubProd, nTasaCom, tasaIva);
 
-            return GenerarDetalleCuotas(nCapital, nPlazo, nSubProd, nTasaCom, fechaInicio, oFeriados, cuotaFijaEstimada, tasaIva, 0);
+            return GenerarDetalleCuotas(nCapital, nPlazo, nSubProd, nTasaCom, fechaInicio, oFeriados, cuotaFijaEstimada, tasaIva, 0, nCodAge, 0);
         }
 
         public async Task<List<CredCalendario>> GenerarCalendarioAsync(int nCodAge, int nCodCred)
@@ -47,12 +47,11 @@ namespace CrediAvanzaAPI.Services
             var creditoRequest = credito.ToCreditoRequest();
 
             // Obtener condiciones de calendario para el crédito
-            var calendarioCond = await (
-                from cc in _context.CredCalendConds
-                join c in _context.Creditos on cc.NNroCalen equals c.IdCalendario
-                where c.NCodAge == nCodAge && c.NCodCred == nCodCred
-                select cc
-            ).FirstOrDefaultAsync() ?? throw new Exception("Condiciones de calendario no encontradas");
+            var calendarioCond = await _context.CredCalendConds
+                .FirstOrDefaultAsync(cc => cc.IdCredCalendCond == credito.IdCredCalendCond)
+                ?? throw new Exception("Condiciones de calendario no encontradas");
+
+            calendarioCond.NNroCalen += 1;
 
             // Obtener la tasa de interés desde la Línea de Crédito asociada
             var lineaCredito = await _context.CredLineaCreditos
@@ -74,13 +73,18 @@ namespace CrediAvanzaAPI.Services
             // Delegar cálculo central a helper financiero para evitar duplicidad
             decimal cuotaFijaEstimada = CalculadoraFinanciera.CalcularCuotaFijaEstimada(saldo, n, credito.NSubProd, tasaInteresMensual, tasaIva);
 
-            return GenerarDetalleCuotas(saldo, n, credito.NSubProd, tasaInteresMensual, fecha, oFeriados, cuotaFijaEstimada, tasaIva, calendarioCond.NNroCalen);
+            var calendario = GenerarDetalleCuotas(saldo, n, credito.NSubProd, tasaInteresMensual, fecha, oFeriados, cuotaFijaEstimada, tasaIva, calendarioCond.NNroCalen, credito.NCodAge, credito.NCodCred);
+
+            await _context.Set<CredCalendario>().AddRangeAsync(calendario);
+            await _context.SaveChangesAsync();
+
+            return calendario;
         }
 
         private List<CredCalendario> GenerarDetalleCuotas(
             decimal nCapital, int nPlazo, int nSubProd, decimal nTasaCom, 
             DateTime fechaInicio, IEnumerable<DateTime> oFeriados, decimal cuotaFijaEstimada, 
-            decimal tasaIva, int nCodCalen)
+            decimal tasaIva, int nCodCalen, int nCodAge, int nCodCred)
         {
             var resultado = new List<CredCalendario>();
             decimal saldoIteracion = nCapital;
@@ -135,19 +139,21 @@ namespace CrediAvanzaAPI.Services
 
                 var item = new CredCalendario
                 {
+                    NCodAge = nCodAge,
+                    NCodCred = nCodCred,
+                    NNroCalen = nCodCalen,
                     NNroCuota = i,
                     DFecVenc = fechaIteracion,
                     NCapital = capitalCuota,
                     NIntComp = interesCompensatorio, 
                     NIntMor = 0m,
                     NIgv = iva, 
-                    nTotalCuota = Math.Round(capitalCuota + interesCompensatorio + iva, 2),
                     NCapPag = 0m,
                     NIntPag = 0m,
                     NIntMorPag = 0m,
                     NIgvPag = 0m,
-                    NEstado = 0,
-                    NNroCalen = nCodCalen    
+                    NTotalCuota = Math.Round(capitalCuota + interesCompensatorio + iva, 2),
+                    NEstado = 0 
                 };
 
                 resultado.Add(item);

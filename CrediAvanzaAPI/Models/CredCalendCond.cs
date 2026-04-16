@@ -15,8 +15,6 @@ public partial class CredCalendCond
 
     public int NNroCalen { get; set; }
 
-    public decimal NGasto { get; set; }
-
     public bool? BCobroSab { get; set; }
 
     public bool? BCobroDom { get; set; }
@@ -24,12 +22,6 @@ public partial class CredCalendCond
     public bool? BCobroFer { get; set; }
 
     public bool? BCuotaDoble { get; set; }
-
-    public int? NCodLineaSecundario { get; set; }
-
-    public int? NTipoCargo { get; set; }
-
-    public int? IdCalendario { get; set; }
 
     public int? IdCalenGasto { get; set; }
 }

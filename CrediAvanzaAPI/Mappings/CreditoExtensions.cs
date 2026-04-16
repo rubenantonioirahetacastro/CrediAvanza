@@ -17,7 +17,6 @@ namespace CrediAvanzaAPI.Mappings
                 nSubProd = credito.NSubProd,
                 nTipoGasto = 1,   // Asumiendo 1 representa gasto de colecturia
                 nPeriodo = credito.NPeriodo,
-                nTipoCargo = 0, // Asumiendo 0 representa un tipo de cargo inicial 
                 nCobroEnAgencia = credito.NCobroEnAgencia ?? 0,
                 nCodCred = credito.NCodCred,
                 nCodAge = credito.NCodAge,

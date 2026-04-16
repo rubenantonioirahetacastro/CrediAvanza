@@ -65,13 +65,13 @@ public partial class DbNegocioContext : DbContext
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see https://go.microsoft.com/fwlink/?LinkId=723263.
-        => optionsBuilder.UseSqlServer("Server=DESKTOP-KTHL7K7\\SQLEXPRESS;Database=DbNegocio;Trusted_Connection=True;MultipleActiveResultSets=true;TrustServerCertificate=True");
+        => optionsBuilder.UseSqlServer("Server=tcp:crediavanza-server.database.windows.net,1433;Initial Catalog=DbNegocio;Persist Security Info=False;User ID=crediavanza;Password=Pepe1234;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;");
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<Agencia>(entity =>
         {
-            entity.HasKey(e => e.NCodAge).HasName("PK__Agencias__771BAD3ED57349AF");
+            entity.HasKey(e => e.NCodAge).HasName("PK__Agencias__771BAD3EF24D8FB8");
 
             entity.Property(e => e.NCodAge)
                 .ValueGeneratedNever()
@@ -200,21 +200,14 @@ public partial class DbNegocioContext : DbContext
             entity.Property(e => e.BCobroFer).HasColumnName("bCobroFer");
             entity.Property(e => e.BCobroSab).HasColumnName("bCobroSab");
             entity.Property(e => e.BCuotaDoble).HasColumnName("bCuotaDoble");
-            entity.Property(e => e.NCodLineaSecundario).HasColumnName("nCodLineaSecundario");
             entity.Property(e => e.NCuotas).HasColumnName("nCuotas");
             entity.Property(e => e.NDiaFijo).HasColumnName("nDiaFijo");
-            entity.Property(e => e.NGasto)
-                .HasColumnType("money")
-                .HasColumnName("nGasto");
             entity.Property(e => e.NNroCalen).HasColumnName("nNroCalen");
             entity.Property(e => e.NPlazo).HasColumnName("nPlazo");
-            entity.Property(e => e.NTipoCargo).HasColumnName("nTipoCargo");
         });
 
         modelBuilder.Entity<CredCalendario>(entity =>
         {
-            entity.HasKey(e => e.IdCalendario).HasName("PK_CredCalendario_1");
-
             entity.ToTable("CredCalendario");
 
             entity.Property(e => e.DFecPago)
@@ -223,15 +216,14 @@ public partial class DbNegocioContext : DbContext
             entity.Property(e => e.DFecVenc)
                 .HasColumnType("datetime")
                 .HasColumnName("dFecVenc");
-            entity.Property(e => e.DFecpro)
-                .HasColumnType("datetime")
-                .HasColumnName("dFecpro");
             entity.Property(e => e.NCapPag)
                 .HasColumnType("money")
                 .HasColumnName("nCapPag");
             entity.Property(e => e.NCapital)
                 .HasColumnType("money")
                 .HasColumnName("nCapital");
+            entity.Property(e => e.NCodAge).HasColumnName("nCodAge");
+            entity.Property(e => e.NCodCred).HasColumnName("nCodCred");
             entity.Property(e => e.NEstado).HasColumnName("nEstado");
             entity.Property(e => e.NIgv)
                 .HasColumnType("money")
@@ -253,7 +245,9 @@ public partial class DbNegocioContext : DbContext
                 .HasColumnName("nIntPag");
             entity.Property(e => e.NNroCalen).HasColumnName("nNroCalen");
             entity.Property(e => e.NNroCuota).HasColumnName("nNroCuota");
-            entity.Property(e => e.NTipoCargo).HasColumnName("nTipoCargo");
+            entity.Property(e => e.NTotalCuota)
+                .HasColumnType("money")
+                .HasColumnName("nTotalCuota");
         });
 
         modelBuilder.Entity<CredCambioGasto>(entity =>
@@ -329,7 +323,7 @@ public partial class DbNegocioContext : DbContext
 
         modelBuilder.Entity<CredLineaCredito>(entity =>
         {
-            entity.HasKey(e => e.NCodLinea).HasName("PK__CredLine__50A988C3ABA5478A");
+            entity.HasKey(e => e.NCodLinea).HasName("PK__CredLine__50A988C3CC0EBAA0");
 
             entity.ToTable("CredLineaCredito");
 
@@ -358,14 +352,13 @@ public partial class DbNegocioContext : DbContext
 
         modelBuilder.Entity<Credito>(entity =>
         {
-            entity.HasKey(e => e.NCodCred).HasName("PK_Creditos_1");
+            entity.HasKey(e => e.NCodCred).HasName("PK_Creditos_1_Tmp");
 
             entity.Property(e => e.NCodCred).HasColumnName("nCodCred");
             entity.Property(e => e.DFecVig)
                 .HasColumnType("datetime")
                 .HasColumnName("dFecVig");
             entity.Property(e => e.NAceptaTerminos).HasColumnName("nAceptaTerminos");
-            entity.Property(e => e.NCiclo).HasColumnName("nCiclo");
             entity.Property(e => e.NCobroEnAgencia).HasColumnName("nCobroEnAgencia");
             entity.Property(e => e.NCodAge).HasColumnName("nCodAge");
             entity.Property(e => e.NCodLinea).HasColumnName("nCodLinea");
@@ -378,7 +371,6 @@ public partial class DbNegocioContext : DbContext
                 .HasColumnType("money")
                 .HasColumnName("nMora");
             entity.Property(e => e.NNroCuotas).HasColumnName("nNroCuotas");
-            entity.Property(e => e.NNroProxCuota).HasColumnName("nNroProxCuota");
             entity.Property(e => e.NPeriodo).HasColumnName("nPeriodo");
             entity.Property(e => e.NPrestamo)
                 .HasColumnType("money")

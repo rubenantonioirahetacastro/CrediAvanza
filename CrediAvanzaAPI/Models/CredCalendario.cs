@@ -5,7 +5,13 @@ namespace CrediAvanzaAPI.Models;
 
 public partial class CredCalendario
 {
-    public int IdCalendario { get; set; }
+    public int Id { get; set; }
+
+    public int? NCodAge { get; set; }
+
+    public int? NCodCred { get; set; }
+
+    public int NNroCalen { get; set; }
 
     public int NNroCuota { get; set; }
 
@@ -21,9 +27,6 @@ public partial class CredCalendario
 
     public decimal NIgv { get; set; }
 
-    [System.ComponentModel.DataAnnotations.Schema.NotMapped]
-    public decimal nTotalCuota { get; set; }
-
     public decimal NCapPag { get; set; }
 
     public decimal NIntPag { get; set; }
@@ -32,11 +35,7 @@ public partial class CredCalendario
 
     public decimal NIgvPag { get; set; }
 
+    public decimal? NTotalCuota { get; set; }
+
     public int NEstado { get; set; }
-
-    public int NNroCalen { get; set; }
-
-    public DateTime? DFecpro { get; set; }
-
-    public int? NTipoCargo { get; set; }
 }
