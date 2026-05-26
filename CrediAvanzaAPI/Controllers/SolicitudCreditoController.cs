@@ -20,13 +20,16 @@ namespace CrediAvanzaAPI.Controllers
         [HttpPost]
         public async Task<IActionResult> Crear([FromBody] SolicitudCreditoRequest request)
         {
+            if (!ModelState.IsValid)
+                return ValidationProblem(ModelState);
+
             var filas = await _service.CrearSolicitudAsync(
                 request.FotoIds,
                 request.FotoDocumentacions,
                 request.FotoNegocios,
                 request.FotoGarantiums,  
                 request.Persona,
-                request.Conyuge ?? null,
+                request.Conyuge,
                 request.Fiador,
                 request.Garantia,
                 request.Negocio,
