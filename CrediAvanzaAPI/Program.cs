@@ -27,6 +27,7 @@ builder.Services.AddScoped<ICalendarioService, CalendarioService>();
 builder.Services.AddScoped<IFeriadoService, FeriadoService>();
 builder.Services.AddScoped<IGastoService, GastoService>();
 builder.Services.AddScoped<IAgenciaService, AgenciaService>();
+builder.Services.AddScoped<IPagoService, PagoService>();
 builder.Services.AddScoped<ErrorLogger>();
 
 builder.Services.AddApplicationInsightsTelemetry(options =>

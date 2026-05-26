@@ -21,8 +21,18 @@ namespace CrediAvanzaAPI.Controllers
         public async Task<IActionResult> Crear([FromBody] SolicitudCreditoRequest request)
         {
             var filas = await _service.CrearSolicitudAsync(
-                request.FotoIds, request.FotoDocumentacions, request.FotoNegocios, request.Persona, request.Conyuge, request.Fiador,
-                request.Garantia, request.Negocio, request.Compra, request.Venta, request.Credito
+                request.FotoIds,
+                request.FotoDocumentacions,
+                request.FotoNegocios,
+                request.FotoGarantiums,  
+                request.Persona,
+                request.Conyuge ?? null,
+                request.Fiador,
+                request.Garantia,
+                request.Negocio,
+                request.Compra,
+                request.Venta,
+                request.Credito
             );
 
             return Ok(new { filasAfectadas = filas });

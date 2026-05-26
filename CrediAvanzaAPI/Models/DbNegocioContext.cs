@@ -47,6 +47,8 @@ public partial class DbNegocioContext : DbContext
 
     public virtual DbSet<FotoDocumentacion> FotoDocumentacions { get; set; }
 
+    public virtual DbSet<FotoGarantium> FotoGarantia { get; set; }
+
     public virtual DbSet<FotoId> FotoIds { get; set; }
 
     public virtual DbSet<FotoNegocio> FotoNegocios { get; set; }
@@ -440,6 +442,15 @@ public partial class DbNegocioContext : DbContext
             entity.HasKey(e => e.IdFoto).HasName("PK_FotoDocumentacion_1");
 
             entity.ToTable("FotoDocumentacion");
+
+            entity.Property(e => e.VFoto)
+                .IsUnicode(false)
+                .HasColumnName("vFoto");
+        });
+
+        modelBuilder.Entity<FotoGarantium>(entity =>
+        {
+            entity.HasKey(e => e.IdFoto);
 
             entity.Property(e => e.VFoto)
                 .IsUnicode(false)
