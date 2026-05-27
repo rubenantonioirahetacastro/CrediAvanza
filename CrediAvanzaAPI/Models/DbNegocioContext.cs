@@ -480,6 +480,9 @@ public partial class DbNegocioContext : DbContext
 
             entity.ToTable("GarantiaFoto");
 
+            entity.Property(e => e.NValor)
+                .HasColumnType("money")
+                .HasColumnName("nValor");
             entity.Property(e => e.VFoto)
                 .IsUnicode(false)
                 .HasColumnName("vFoto");
