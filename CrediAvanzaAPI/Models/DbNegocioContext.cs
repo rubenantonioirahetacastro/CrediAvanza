@@ -61,6 +61,8 @@ public partial class DbNegocioContext : DbContext
 
     public virtual DbSet<Persona> Personas { get; set; }
 
+    public virtual DbSet<UsuarioLogin> UsuarioLogins { get; set; }
+
     public virtual DbSet<Venta> Ventas { get; set; }
 
     public virtual DbSet<VerNegocio> VerNegocios { get; set; }
@@ -576,6 +578,27 @@ public partial class DbNegocioContext : DbContext
             entity.Property(e => e.NProfesion).HasColumnName("nProfesion");
             entity.Property(e => e.NSexo).HasColumnName("nSexo");
             entity.Property(e => e.NTipoDocumento).HasColumnName("nTipoDocumento");
+        });
+
+        modelBuilder.Entity<UsuarioLogin>(entity =>
+        {
+            entity.HasKey(e => e.IdUsuario).HasName("PK_UsuaroLogin");
+
+            entity.ToTable("UsuarioLogin");
+
+            entity.Property(e => e.CCorreo)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasColumnName("cCorreo");
+            entity.Property(e => e.CDocumento)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasColumnName("cDocumento");
+            entity.Property(e => e.Password)
+                .HasMaxLength(250)
+                .IsUnicode(false);
+            entity.Property(e => e.TokenTime).HasColumnType("datetime");
+            entity.Property(e => e.UltimoLogin).HasColumnType("datetime");
         });
 
         modelBuilder.Entity<Venta>(entity =>

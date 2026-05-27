@@ -28,6 +28,7 @@ builder.Services.AddScoped<IFeriadoService, FeriadoService>();
 builder.Services.AddScoped<IGastoService, GastoService>();
 builder.Services.AddScoped<IAgenciaService, AgenciaService>();
 builder.Services.AddScoped<IPagoService, PagoService>();
+builder.Services.AddScoped<IEmailService, SmtpEmailService>();
 builder.Services.AddScoped<ErrorLogger>();
 
 builder.Services.AddApplicationInsightsTelemetry(options =>

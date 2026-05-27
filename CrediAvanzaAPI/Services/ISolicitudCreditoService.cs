@@ -12,7 +12,6 @@ namespace CrediAvanzaAPI.Services
              Persona persona,
              Conyuge conyuge,
              Fiador fiador,
-             Garantium garantia,
              Negocio negocio,
              List<Compra> compra,
              List<Venta> venta,
