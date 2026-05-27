@@ -1,5 +1,4 @@
 ﻿using CrediAvanzaAPI.Models;
-using CrediAvanzaAPI.Request;
 
 namespace CrediAvanzaAPI.Services
 {
@@ -8,11 +7,12 @@ namespace CrediAvanzaAPI.Services
         Task<int> CrearSolicitudAsync(
              List<FotoId> fotoIds,
              List<FotoDocumentacion> fotoDocumentacions,
+             List<GarantiaFoto> fotoGarantias,
              List<FotoNegocio> fotoNegocios,
-         List<GarantiaConFotosRequest> garantias,
              Persona persona,
-             Conyuge? conyuge,
+             Conyuge conyuge,
              Fiador fiador,
+             Garantium garantia,
              Negocio negocio,
              List<Compra> compra,
              List<Venta> venta,

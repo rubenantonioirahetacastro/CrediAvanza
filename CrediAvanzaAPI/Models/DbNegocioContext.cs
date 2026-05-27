@@ -47,11 +47,11 @@ public partial class DbNegocioContext : DbContext
 
     public virtual DbSet<FotoDocumentacion> FotoDocumentacions { get; set; }
 
-    public virtual DbSet<FotoGarantium> FotoGarantia { get; set; }
-
     public virtual DbSet<FotoId> FotoIds { get; set; }
 
     public virtual DbSet<FotoNegocio> FotoNegocios { get; set; }
+
+    public virtual DbSet<GarantiaFoto> GarantiaFotos { get; set; }
 
     public virtual DbSet<Garantium> Garantia { get; set; }
 
@@ -448,15 +448,6 @@ public partial class DbNegocioContext : DbContext
                 .HasColumnName("vFoto");
         });
 
-        modelBuilder.Entity<FotoGarantium>(entity =>
-        {
-            entity.HasKey(e => e.IdFoto);
-
-            entity.Property(e => e.VFoto)
-                .IsUnicode(false)
-                .HasColumnName("vFoto");
-        });
-
         modelBuilder.Entity<FotoId>(entity =>
         {
             entity.HasKey(e => e.IdFoto).HasName("PK_Foto");
@@ -481,15 +472,20 @@ public partial class DbNegocioContext : DbContext
                 .HasColumnName("vFoto");
         });
 
+        modelBuilder.Entity<GarantiaFoto>(entity =>
+        {
+            entity.HasKey(e => e.IdFoto).HasName("PK_FotoGarantia");
+
+            entity.ToTable("GarantiaFoto");
+
+            entity.Property(e => e.VFoto)
+                .IsUnicode(false)
+                .HasColumnName("vFoto");
+        });
+
         modelBuilder.Entity<Garantium>(entity =>
         {
             entity.HasKey(e => e.IdGarantia);
-
-            entity.Property(e => e.NIdArticuloGarantia).HasColumnName("nIdArticuloGarantia");
-            entity.Property(e => e.NIdFotoGarantia).HasColumnName("nIdFotoGarantia");
-            entity.Property(e => e.NValor)
-                .HasColumnType("money")
-                .HasColumnName("nValor");
         });
 
         modelBuilder.Entity<LogErrore>(entity =>

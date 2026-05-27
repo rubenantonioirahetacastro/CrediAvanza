@@ -9,7 +9,5 @@ public partial class FotoGarantium
 
     public string? VFoto { get; set; }
 
-    public int IdTipoGarantia { get; set; }
-
-    public int IdGarantia { get; set; }
+    public int? IdGarantia { get; set; }
 }
