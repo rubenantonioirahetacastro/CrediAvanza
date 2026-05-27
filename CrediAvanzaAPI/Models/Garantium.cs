@@ -11,5 +11,5 @@ public partial class Garantium
 
     public decimal NValor { get; set; }
 
-    public int NIdFotoGarantia { get; set; }
+    public int? NIdFotoGarantia { get; set; }
 }

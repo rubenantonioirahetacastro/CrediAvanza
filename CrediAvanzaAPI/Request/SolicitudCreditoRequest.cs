@@ -2,6 +2,12 @@
 
 namespace CrediAvanzaAPI.Request
 {
+    public class GarantiaConFotosRequest
+    {
+        public Garantium Garantia { get; set; } = null!;
+        public List<FotoGarantium> Fotos { get; set; } = new();
+    }
+
     public class SolicitudCreditoRequest
     {
         public List<FotoId> FotoIds { get; set; } = new();
@@ -13,6 +19,7 @@ namespace CrediAvanzaAPI.Request
         public Documentacion? Documentacion { get; set; }
         public Fiador Fiador { get; set; } = null!;
         public Garantium Garantia { get; set; } = null!;
+        public List<GarantiaConFotosRequest> Garantias { get; set; } = new();
         public Negocio Negocio { get; set; } = null!;
         public List<Compra> Compra { get; set; } = new();
         public List<Venta> Venta { get; set; } = new();

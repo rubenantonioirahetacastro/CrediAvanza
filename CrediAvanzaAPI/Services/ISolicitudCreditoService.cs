@@ -1,4 +1,5 @@
 ﻿using CrediAvanzaAPI.Models;
+using CrediAvanzaAPI.Request;
 
 namespace CrediAvanzaAPI.Services
 {
@@ -8,11 +9,10 @@ namespace CrediAvanzaAPI.Services
              List<FotoId> fotoIds,
              List<FotoDocumentacion> fotoDocumentacions,
              List<FotoNegocio> fotoNegocios,
-             List<FotoGarantium> fotoGarantiums,
+         List<GarantiaConFotosRequest> garantias,
              Persona persona,
              Conyuge? conyuge,
              Fiador fiador,
-             Garantium garantia,
              Negocio negocio,
              List<Compra> compra,
              List<Venta> venta,

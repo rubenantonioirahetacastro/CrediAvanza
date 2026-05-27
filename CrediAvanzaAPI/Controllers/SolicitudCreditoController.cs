@@ -18,20 +18,35 @@ namespace CrediAvanzaAPI.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Crear([FromBody] SolicitudCreditoRequest request)
+        public async Task<IActionResult> Crear([FromBody] SolicitudCreditoRequest? request)
         {
+            if (request == null)
+                return BadRequest("Body requerido");
+
             if (!ModelState.IsValid)
                 return ValidationProblem(ModelState);
+
+            // Soporte para múltiples garantías con fotos (nuevo formato)
+            // Si no viene la lista, mantenemos el comportamiento anterior (una garantía).
+            var garantias = request.Garantias != null && request.Garantias.Any()
+                ? request.Garantias
+                : new List<GarantiaConFotosRequest>
+                {
+                    new()
+                    {
+                        Garantia = request.Garantia,
+                        Fotos = request.FotoGarantiums
+                    }
+                };
 
             var filas = await _service.CrearSolicitudAsync(
                 request.FotoIds,
                 request.FotoDocumentacions,
                 request.FotoNegocios,
-                request.FotoGarantiums,  
+                garantias,
                 request.Persona,
                 request.Conyuge,
                 request.Fiador,
-                request.Garantia,
                 request.Negocio,
                 request.Compra,
                 request.Venta,
