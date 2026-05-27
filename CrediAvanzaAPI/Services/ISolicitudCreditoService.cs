@@ -6,11 +6,11 @@ namespace CrediAvanzaAPI.Services
     {
         Task<int> CrearSolicitudAsync(
              List<FotoId> fotoIds,
-             List<FotoDocumentacion> fotoDocumentacions,
-             List<GarantiaFoto> fotoGarantias,
-             List<FotoNegocio> fotoNegocios,
+             List<FotoDocumentacion>? fotoDocumentacions,
+             List<GarantiaFoto>? fotoGarantias,
+             List<FotoNegocio>? fotoNegocios,
              Persona persona,
-             Conyuge conyuge,
+             Conyuge? conyuge,
              Fiador fiador,
              Negocio negocio,
              List<Compra> compra,

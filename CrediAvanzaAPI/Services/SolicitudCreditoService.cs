@@ -64,39 +64,40 @@ namespace CrediAvanzaAPI.Services
                 credito.IdDocumentacion = documentacion.IdDocumentacion;
                 credito.IdGarantia = garantia.IdGarantia;
 
-                bool existeUsuario = await context.UsuarioLogins
-                    .AnyAsync(x => x.CDocumento == persona.CDocumento);
+                var correo = string.IsNullOrWhiteSpace(persona.CCorreo)
+                    ? $"{persona.CDocumento}@crediavanza.com"
+                    : persona.CCorreo;
+                const string chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+                var random = new Random();
 
-                if (!existeUsuario)
+                var passwordTemporal = new string(
+                    Enumerable.Repeat(chars, 6)
+                        .Select(s => s[random.Next(s.Length)])
+                        .ToArray()
+                );
+                var token = Random.Shared.Next(0, 1_000_000).ToString("D6");
+                var tokenInt = int.Parse(token);
+
+                await context.UsuarioLogins.AddAsync(new UsuarioLogin
                 {
-                    var correo = string.IsNullOrWhiteSpace(persona.CCorreo)
-                        ? $"{persona.CDocumento}@crediavanza.com"
-                        : persona.CCorreo;
+                    CDocumento = persona.CDocumento,
+                    CCorreo = correo,
+                    Password = BCrypt.Net.BCrypt.HashPassword(passwordTemporal),
+                    Token = tokenInt,
+                    TokenTime = DateTime.UtcNow,
+                    Estado = 1,
+                    IntentosFallidos = 0,
+                    Bloqueado = 0,
+                    TokenCheck = false
+                });
 
-                    var token = Random.Shared.Next(0, 1_000_000).ToString("D6");
-                    var tokenInt = int.Parse(token);
+                var subject = "Solicitud de crédito recibida";
+                var nombre = string.IsNullOrWhiteSpace(persona.CNombres + ' ' + persona.CPrimerApellido)
+                    ? persona.CDocumento
+                    : persona.CNombres;
+                var body = EmailTemplates.SolicitudCredito(nombre, tokenInt, passwordTemporal);
 
-                    await context.UsuarioLogins.AddAsync(new UsuarioLogin
-                    {
-                        CDocumento = persona.CDocumento,
-                        CCorreo = correo,
-                        Password = BCrypt.Net.BCrypt.HashPassword(persona.CDocumento),
-                        Token = tokenInt,
-                        TokenTime = DateTime.UtcNow,
-                        Estado = 1,
-                        IntentosFallidos = 0,
-                        Bloqueado = 0,
-                        TokenCheck = false
-                    });
-
-                    var subject = "Solicitud de crédito recibida";
-                    var nombre = string.IsNullOrWhiteSpace(persona.CNombres)
-                        ? persona.CDocumento
-                        : persona.CNombres;
-                    var body = EmailTemplates.SolicitudCredito(nombre, tokenInt);
-
-                    await emailService.SendAsync(correo, subject, body);
-                }
+                await emailService.SendAsync(correo, subject, body);
 
 
                 await context.Creditos.AddAsync(credito);
