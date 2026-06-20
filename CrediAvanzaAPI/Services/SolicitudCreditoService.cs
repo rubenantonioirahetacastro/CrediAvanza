@@ -81,6 +81,7 @@ namespace CrediAvanzaAPI.Services
                 await context.UsuarioLogins.AddAsync(new UsuarioLogin
                 {
                     CDocumento = persona.CDocumento,
+                    IdPersona = persona.IdPersona,
                     CCorreo = correo,
                     Password = BCrypt.Net.BCrypt.HashPassword(passwordTemporal),
                     Token = tokenInt,

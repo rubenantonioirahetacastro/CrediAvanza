@@ -120,7 +120,9 @@ public partial class DbNegocioContext : DbContext
                 .HasMaxLength(50)
                 .IsUnicode(false)
                 .HasColumnName("cProducto");
-            entity.Property(e => e.NCantidadCompra).HasColumnName("nCantidadCompra");
+            entity.Property(e => e.NCantidadCompra)
+                .HasColumnType("decimal(18, 2)")
+                .HasColumnName("nCantidadCompra");
             entity.Property(e => e.NPrecioTotal)
                 .HasColumnType("money")
                 .HasColumnName("nPrecioTotal");
@@ -612,7 +614,9 @@ public partial class DbNegocioContext : DbContext
                 .HasMaxLength(50)
                 .IsUnicode(false)
                 .HasColumnName("cProducto");
-            entity.Property(e => e.NCantidadVenta).HasColumnName("nCantidadVenta");
+            entity.Property(e => e.NCantidadVenta)
+                .HasColumnType("decimal(18, 2)")
+                .HasColumnName("nCantidadVenta");
             entity.Property(e => e.NPrecioTotal)
                 .HasColumnType("money")
                 .HasColumnName("nPrecioTotal");

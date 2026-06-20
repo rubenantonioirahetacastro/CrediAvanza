@@ -30,12 +30,8 @@ namespace CrediAvanzaAPI.Controllers
                 select 1
             ).AnyAsync();
 
-            if (!existe)
-            {
-                return Ok(null);
-            }
-
-            return Ok(new { message = "El documento ingresado ya posee un credito o solicitud en proceso, favor iniciar sesión o recuperar contraseña" });
+            // Devolver 1 si existe, 0 si no existe
+            return Ok(existe ? 1 : 0);
         }
     }
 }

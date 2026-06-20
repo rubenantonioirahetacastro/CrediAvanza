@@ -9,7 +9,7 @@ public partial class Compra
 
     public string CProducto { get; set; } = null!;
 
-    public int NCantidadCompra { get; set; }
+    public decimal NCantidadCompra { get; set; }
 
     public int NUnidadMedida { get; set; }
 
