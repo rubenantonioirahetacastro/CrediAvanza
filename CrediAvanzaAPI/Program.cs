@@ -6,6 +6,9 @@ using Serilog;
 using Serilog.Events;
 using Serilog.Sinks.ApplicationInsights.TelemetryConverters;
 
+// CrediAvanza API - Entry point for the application
+// This file configures services, logging, and the HTTP request pipeline for the API
+
 var builder = WebApplication.CreateBuilder(args);
 
 var applicationInsightsConnectionString = builder.Configuration["ApplicationInsights:ConnectionString"];
