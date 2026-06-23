@@ -56,4 +56,6 @@ public partial class Credito
     public int? IdCredCalendCond { get; set; }
 
     public int? IdNegocio { get; set; }
+
+    public int? IdCapacidadPago { get; set; }
 }

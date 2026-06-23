@@ -17,6 +17,8 @@ public partial class DbNegocioContext : DbContext
 
     public virtual DbSet<Agencia> Agencias { get; set; }
 
+    public virtual DbSet<CapacidadPago> CapacidadPagos { get; set; }
+
     public virtual DbSet<CatalogoCodigo> CatalogoCodigos { get; set; }
 
     public virtual DbSet<Compra> Compras { get; set; }
@@ -96,6 +98,29 @@ public partial class DbNegocioContext : DbContext
                 .HasMaxLength(20)
                 .IsUnicode(false)
                 .HasColumnName("cTelefAge");
+        });
+
+        modelBuilder.Entity<CapacidadPago>(entity =>
+        {
+            entity.HasKey(e => e.IdCapacidadPago);
+
+            entity.ToTable("CapacidadPago");
+
+            entity.Property(e => e.DGastosAlimentacion)
+                .HasColumnType("decimal(18, 2)")
+                .HasColumnName("dGastosAlimentacion");
+            entity.Property(e => e.DGastosEducacion)
+                .HasColumnType("decimal(18, 2)")
+                .HasColumnName("dGastosEducacion");
+            entity.Property(e => e.DGastosSalud)
+                .HasColumnType("decimal(18, 2)")
+                .HasColumnName("dGastosSalud");
+            entity.Property(e => e.DOtrosGastos)
+                .HasColumnType("decimal(18, 2)")
+                .HasColumnName("dOtrosGastos");
+            entity.Property(e => e.DOtrosIngresos)
+                .HasColumnType("decimal(18, 2)")
+                .HasColumnName("dOtrosIngresos");
         });
 
         modelBuilder.Entity<CatalogoCodigo>(entity =>
