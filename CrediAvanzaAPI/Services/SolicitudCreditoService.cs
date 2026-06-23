@@ -20,6 +20,7 @@ namespace CrediAvanzaAPI.Services
             Conyuge? conyuge,
             Fiador? fiador,
             Negocio? negocio,
+            CapacidadPago? capacidadPago,
             List<Compra>? compra,
             List<Venta>? venta,
             Credito credito)
@@ -39,6 +40,7 @@ namespace CrediAvanzaAPI.Services
 
                 await context.Documentacions.AddAsync(documentacion);
                 await context.Garantia.AddAsync(garantia);
+                if (capacidadPago != null) await context.CapacidadPagos.AddAsync(capacidadPago);
 
                 await context.SaveChangesAsync();
 
@@ -63,6 +65,7 @@ namespace CrediAvanzaAPI.Services
                 credito.IdNegocio = negocio?.IdNegocio;
                 credito.IdDocumentacion = documentacion.IdDocumentacion;
                 credito.IdGarantia = garantia.IdGarantia;
+                credito.IdCapacidadPago = capacidadPago?.IdCapacidadPago;
 
                 var correo = string.IsNullOrWhiteSpace(persona.CCorreo)
                     ? $"{persona.CDocumento}@crediavanza.com"

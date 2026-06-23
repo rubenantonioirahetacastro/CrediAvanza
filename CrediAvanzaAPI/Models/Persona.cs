@@ -42,4 +42,8 @@ public partial class Persona
     public int NEscolaridad { get; set; }
 
     public string? CCorreo { get; set; }
+
+    public int NTelefono { get; set; }
+
+    public int NCelular { get; set; }
 }

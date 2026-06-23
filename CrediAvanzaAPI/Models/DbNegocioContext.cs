@@ -43,6 +43,8 @@ public partial class DbNegocioContext : DbContext
 
     public virtual DbSet<Credito> Creditos { get; set; }
 
+    public virtual DbSet<Departamento> Departamentos { get; set; }
+
     public virtual DbSet<Documentacion> Documentacions { get; set; }
 
     public virtual DbSet<Fiador> Fiadors { get; set; }
@@ -58,6 +60,8 @@ public partial class DbNegocioContext : DbContext
     public virtual DbSet<Garantium> Garantia { get; set; }
 
     public virtual DbSet<LogErrore> LogErrores { get; set; }
+
+    public virtual DbSet<Municipio> Municipios { get; set; }
 
     public virtual DbSet<Negocio> Negocios { get; set; }
 
@@ -422,6 +426,16 @@ public partial class DbNegocioContext : DbContext
                 .HasColumnName("nTasaMor");
         });
 
+        modelBuilder.Entity<Departamento>(entity =>
+        {
+            entity.HasKey(e => e.IdDepartamento).HasName("PK__Departam__787A433DF74032C7");
+
+            entity.Property(e => e.CNombre)
+                .HasMaxLength(150)
+                .IsUnicode(false)
+                .HasColumnName("cNombre");
+        });
+
         modelBuilder.Entity<Documentacion>(entity =>
         {
             entity.HasKey(e => e.IdDocumentacion);
@@ -542,6 +556,21 @@ public partial class DbNegocioContext : DbContext
                 .IsUnicode(false);
         });
 
+        modelBuilder.Entity<Municipio>(entity =>
+        {
+            entity.HasKey(e => e.IdMunicipio).HasName("PK__Municipi__610059786D824024");
+
+            entity.Property(e => e.CNombre)
+                .HasMaxLength(150)
+                .IsUnicode(false)
+                .HasColumnName("cNombre");
+
+            entity.HasOne(d => d.IdDepartamentoNavigation).WithMany(p => p.Municipios)
+                .HasForeignKey(d => d.IdDepartamento)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_Municipios_Departamentos");
+        });
+
         modelBuilder.Entity<Negocio>(entity =>
         {
             entity.HasKey(e => e.IdNegocio);
@@ -598,6 +627,7 @@ public partial class DbNegocioContext : DbContext
             entity.Property(e => e.DFechaExpedicion).HasColumnName("dFechaExpedicion");
             entity.Property(e => e.DFechaNacimiento).HasColumnName("dFechaNacimiento");
             entity.Property(e => e.DFechaVencimiento).HasColumnName("dFechaVencimiento");
+            entity.Property(e => e.NCelular).HasColumnName("nCelular");
             entity.Property(e => e.NDepartamentoDoc).HasColumnName("nDepartamentoDoc");
             entity.Property(e => e.NDepartamentoNacimiento).HasColumnName("nDepartamentoNacimiento");
             entity.Property(e => e.NEscolaridad).HasColumnName("nEscolaridad");
@@ -607,6 +637,7 @@ public partial class DbNegocioContext : DbContext
             entity.Property(e => e.NNacionalidad).HasColumnName("nNacionalidad");
             entity.Property(e => e.NProfesion).HasColumnName("nProfesion");
             entity.Property(e => e.NSexo).HasColumnName("nSexo");
+            entity.Property(e => e.NTelefono).HasColumnName("nTelefono");
             entity.Property(e => e.NTipoDocumento).HasColumnName("nTipoDocumento");
         });
 
