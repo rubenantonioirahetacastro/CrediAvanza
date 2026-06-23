@@ -29,6 +29,7 @@ namespace CrediAvanzaAPI.Controllers
                 request.Conyuge,
                 request.Fiador,
                 request.Negocio,
+                request.CapacidadPago,
                 request.Compra,
                 request.Venta,
                 request.Credito

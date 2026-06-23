@@ -13,6 +13,7 @@ namespace CrediAvanzaAPI.Services
              Conyuge? conyuge,
              Fiador fiador,
              Negocio negocio,
+             CapacidadPago? capacidadPago,
              List<Compra> compra,
              List<Venta> venta,
              Credito credito

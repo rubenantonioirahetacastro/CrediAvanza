@@ -14,10 +14,10 @@ namespace CrediAvanzaAPI.Request
         public Fiador? Fiador { get; set; }
         public Garantium? Garantia { get; set; }
         public Negocio? Negocio { get; set; }
+        public CapacidadPago? CapacidadPago { get; set; }
         public List<Compra>? Compra { get; set; }
         public List<Venta>? Venta { get; set; }
         public Credito Credito { get; set; }
 
     }
 }
-

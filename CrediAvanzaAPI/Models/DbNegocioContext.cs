@@ -389,6 +389,7 @@ public partial class DbNegocioContext : DbContext
             entity.Property(e => e.DFecVig)
                 .HasColumnType("datetime")
                 .HasColumnName("dFecVig");
+            entity.Property(e => e.IdCapacidadPago).HasColumnName("IdCapacidadPago");
             entity.Property(e => e.NAceptaTerminos).HasColumnName("nAceptaTerminos");
             entity.Property(e => e.NCobroEnAgencia).HasColumnName("nCobroEnAgencia");
             entity.Property(e => e.NCodAge).HasColumnName("nCodAge");

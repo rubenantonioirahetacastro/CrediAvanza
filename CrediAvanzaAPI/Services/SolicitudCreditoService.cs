@@ -20,6 +20,7 @@ namespace CrediAvanzaAPI.Services
             Conyuge? conyuge,
             Fiador? fiador,
             Negocio? negocio,
+            CapacidadPago? capacidadPago,
             List<Compra>? compra,
             List<Venta>? venta,
             Credito credito)
@@ -36,6 +37,7 @@ namespace CrediAvanzaAPI.Services
                 if (conyuge != null) await context.Conyuges.AddAsync(conyuge);
                 if (fiador != null) await context.Fiadors.AddAsync(fiador);
                 if (negocio != null) await context.Negocios.AddAsync(negocio);
+                if (capacidadPago != null) await context.CapacidadPagos.AddAsync(capacidadPago);
 
                 await context.Documentacions.AddAsync(documentacion);
                 await context.Garantia.AddAsync(garantia);
@@ -61,6 +63,7 @@ namespace CrediAvanzaAPI.Services
                 credito.IdConyuge = conyuge?.IdConyuge;
                 credito.IdFiador = fiador?.IdFiador;
                 credito.IdNegocio = negocio?.IdNegocio;
+                credito.IdCapacidadPago = capacidadPago?.IdCapacidadPago;
                 credito.IdDocumentacion = documentacion.IdDocumentacion;
                 credito.IdGarantia = garantia.IdGarantia;
 

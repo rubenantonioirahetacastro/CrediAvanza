@@ -22,6 +22,39 @@ namespace CrediAvanzaAPI.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
+            modelBuilder.Entity("CrediAvanzaAPI.Models.CapacidadPago", b =>
+                {
+                    b.Property<int>("IdCapacidadPago")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("IdCapacidadPago"));
+
+                    b.Property<decimal>("DGastosAlimentacion")
+                        .HasColumnType("decimal(18, 2)")
+                        .HasColumnName("dGastosAlimentacion");
+
+                    b.Property<decimal>("DGastosEducacion")
+                        .HasColumnType("decimal(18, 2)")
+                        .HasColumnName("dGastosEducacion");
+
+                    b.Property<decimal>("DGastosSalud")
+                        .HasColumnType("decimal(18, 2)")
+                        .HasColumnName("dGastosSalud");
+
+                    b.Property<decimal>("DOtrosGastos")
+                        .HasColumnType("decimal(18, 2)")
+                        .HasColumnName("dOtrosGastos");
+
+                    b.Property<decimal>("DOtrosIngresos")
+                        .HasColumnType("decimal(18, 2)")
+                        .HasColumnName("dOtrosIngresos");
+
+                    b.HasKey("IdCapacidadPago");
+
+                    b.ToTable("CapacidadPago");
+                });
+
             modelBuilder.Entity("CrediAvanzaAPI.Models.CatalogoCodigo", b =>
                 {
                     b.Property<int>("NCodigo")
@@ -496,6 +529,9 @@ namespace CrediAvanzaAPI.Migrations
                         .HasColumnName("dFecVig");
 
                     b.Property<int?>("IdCalendario")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("IdCapacidadPago")
                         .HasColumnType("int");
 
                     b.Property<int?>("IdConyuge")
