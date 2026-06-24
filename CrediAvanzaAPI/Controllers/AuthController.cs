@@ -229,8 +229,8 @@ public class AuthController : ControllerBase
     [HttpPost("change-temp-password")]
     public async Task<IActionResult> ChangeTempPassword([FromBody] Request.ChangeTempPasswordRequest request)
     {
-        if (string.IsNullOrWhiteSpace(request.Usuario) || string.IsNullOrWhiteSpace(request.ContrasenaTemporal) || string.IsNullOrWhiteSpace(request.ContrasenaNueva))
-            return BadRequest(new { Exito = false, Mensaje = "Usuario, ContraseñaTemporal y ContraseñaNueva son obligatorios." });
+        if (string.IsNullOrWhiteSpace(request.Usuario) || string.IsNullOrWhiteSpace(request.ContrasenaNueva))
+            return BadRequest(new { Exito = false, Mensaje = "Usuario y ContraseñaNueva son obligatorios." });
 
         var user = await _context.UsuarioLogins.FirstOrDefaultAsync(u => u.CDocumento == request.Usuario);
         if (user == null)
@@ -243,40 +243,7 @@ public class AuthController : ControllerBase
         if (user.BContrasenaTemporal != true)
             return BadRequest(new { Exito = false, Mensaje = "El usuario no tiene contraseña temporal" });
 
-        // Verify temporary password
-        if (!BCrypt.Net.BCrypt.Verify(request.ContrasenaTemporal, user.Password))
-        {
-            user.IntentosFallidos = (user.IntentosFallidos ?? 0) + 1;
-
-            if (user.IntentosFallidos >= 3)
-            {
-                user.Bloqueado = 1;
-                user.FechaBloqueo = int.Parse(DateTime.UtcNow.ToString("yyyyMMdd"));
-
-                await _context.PasswordChangeAudits.AddAsync(new PasswordChangeAudit
-                {
-                    IdUsuario = user.IdUsuario,
-                    IdPersona = user.IdPersona,
-                    Usuario = user.CDocumento,
-                    Exito = false,
-                    FechaAttempt = DateTime.UtcNow,
-                    Ip = HttpContext.Connection.RemoteIpAddress?.ToString(),
-                    UserAgent = Request.Headers["User-Agent"].ToString(),
-                    IntentosFallidos = user.IntentosFallidos,
-                    Bloqueado = true,
-                    FechaBloqueo = DateTime.UtcNow,
-                    MotivoBloqueo = "Tres intentos fallidos",
-                    Observacion = "Cuenta bloqueada por intentos fallidos al cambiar contraseña temporal"
-                });
-            }
-
-            _context.UsuarioLogins.Update(user);
-            await _context.SaveChangesAsync();
-
-            return BadRequest(new { Exito = false, Mensaje = "Contraseña temporal incorrecta", Cambiada = false });
-        }
-
-        // Temporary password correct: update to new password
+        // Update to new password without requiring the old one (as requested)
         user.IntentosFallidos = 0;
         user.Password = BCrypt.Net.BCrypt.HashPassword(request.ContrasenaNueva);
         user.UltimoLogin = DateTime.UtcNow;
@@ -373,9 +340,28 @@ public class AuthController : ControllerBase
         };
 
         var roles = await _context.UsuarioRoles.Where(ur => ur.IdUsuario == user.IdUsuario).Include(ur => ur.IdRolNavigation).Select(ur => ur.IdRolNavigation.Nombre).ToListAsync();
-        foreach (var r in roles)
+        // Only allow login for users with role 'Usuario' or 'Usuario estándar'
+        var allowedRoles = new[] { "Usuario", "Usuario estándar" };
+        var hasAllowedRole = roles != null && roles.Any(r => allowedRoles.Contains(r));
+        if (!hasAllowedRole)
         {
-            claims.Add(new Claim(ClaimTypes.Role, r));
+            // Audit denied login due to missing allowed role
+            await _context.PasswordChangeAudits.AddAsync(new PasswordChangeAudit
+            {
+                IdUsuario = user.IdUsuario,
+                IdPersona = user.IdPersona,
+                Usuario = user.CDocumento,
+                Exito = false,
+                FechaAttempt = DateTime.UtcNow,
+                Ip = HttpContext.Connection.RemoteIpAddress?.ToString(),
+                UserAgent = Request.Headers["User-Agent"].ToString(),
+                IntentosFallidos = user.IntentosFallidos,
+                Bloqueado = false,
+                Observacion = "Intento de login rechazado: rol no permitido"
+            });
+            await _context.SaveChangesAsync();
+
+            return Forbid();
         }
 
         var jwtKey = _config["Jwt:Key"] ?? "ChangeThisSecretInProduction_ReplaceMeWithStrongKey";
@@ -408,6 +394,6 @@ public class AuthController : ControllerBase
 
         await _context.SaveChangesAsync();
 
-        return Ok(new { Exito = true, Mensaje = "Autenticación exitosa", Token = tokenString, EsContrasenaTemporal = user.BContrasenaTemporal });
+        return Ok(new { Exito = true, Mensaje = "Autenticación exitosa", Token = tokenString, bTemporal = user.BContrasenaTemporal });
     }
 }
