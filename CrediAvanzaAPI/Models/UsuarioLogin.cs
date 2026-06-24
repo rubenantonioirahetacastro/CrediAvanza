@@ -34,4 +34,6 @@ public partial class UsuarioLogin
     public bool? BContrasenaTemporal { get; set; }
 
     public DateTime? DFechaContrasenaTemporal { get; set; }
+
+    public virtual ICollection<UsuarioRole> UsuarioRoles { get; set; } = new List<UsuarioRole>();
 }

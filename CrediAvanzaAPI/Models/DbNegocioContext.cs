@@ -69,7 +69,11 @@ public partial class DbNegocioContext : DbContext
 
     public virtual DbSet<Persona> Personas { get; set; }
 
+    public virtual DbSet<Role> Roles { get; set; }
+
     public virtual DbSet<UsuarioLogin> UsuarioLogins { get; set; }
+
+    public virtual DbSet<UsuarioRole> UsuarioRoles { get; set; }
 
     public virtual DbSet<Venta> Ventas { get; set; }
 
@@ -671,6 +675,24 @@ public partial class DbNegocioContext : DbContext
             entity.Property(e => e.NTipoDocumento).HasColumnName("nTipoDocumento");
         });
 
+        modelBuilder.Entity<Role>(entity =>
+        {
+            entity.HasKey(e => e.IdRol).HasName("PK__Roles__2A49584C591AAB31");
+
+            entity.HasIndex(e => e.Nombre, "UQ__Roles__75E3EFCF90476A50").IsUnique();
+
+            entity.Property(e => e.Activo).HasDefaultValue(true);
+            entity.Property(e => e.Descripcion)
+                .HasMaxLength(200)
+                .IsUnicode(false);
+            entity.Property(e => e.FechaCreacion)
+                .HasDefaultValueSql("(getdate())")
+                .HasColumnType("datetime");
+            entity.Property(e => e.Nombre)
+                .HasMaxLength(50)
+                .IsUnicode(false);
+        });
+
         modelBuilder.Entity<UsuarioLogin>(entity =>
         {
             entity.HasKey(e => e.IdUsuario).HasName("PK_UsuaroLogin");
@@ -694,6 +716,27 @@ public partial class DbNegocioContext : DbContext
                 .IsUnicode(false);
             entity.Property(e => e.TokenTime).HasColumnType("datetime");
             entity.Property(e => e.UltimoLogin).HasColumnType("datetime");
+        });
+
+        modelBuilder.Entity<UsuarioRole>(entity =>
+        {
+            entity.HasKey(e => e.IdUsuarioRol).HasName("PK__UsuarioR__6806BF4AC5289D17");
+
+            entity.HasIndex(e => new { e.IdUsuario, e.IdRol }, "UQ_UsuarioRoles").IsUnique();
+
+            entity.Property(e => e.FechaAsignacion)
+                .HasDefaultValueSql("(getdate())")
+                .HasColumnType("datetime");
+
+            entity.HasOne(d => d.IdRolNavigation).WithMany(p => p.UsuarioRoles)
+                .HasForeignKey(d => d.IdRol)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_UsuarioRoles_Roles");
+
+            entity.HasOne(d => d.IdUsuarioNavigation).WithMany(p => p.UsuarioRoles)
+                .HasForeignKey(d => d.IdUsuario)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_UsuarioRoles_Usuario");
         });
 
         modelBuilder.Entity<Venta>(entity =>

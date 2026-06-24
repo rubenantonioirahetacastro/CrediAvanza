@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Authorization;
 using CrediAvanzaAPI.Services;
 using Microsoft.EntityFrameworkCore;
 using BCrypt.Net;
+using System.Security.Claims;
 
 namespace CrediAvanzaAPI.Controllers;
 
@@ -19,6 +20,17 @@ public class AuthController : ControllerBase
     {
         _context = context;
         _emailService = emailService;
+    }
+
+    // Debug endpoint to inspect token claims and roles
+    [HttpGet("me")]
+    [Authorize]
+    public IActionResult Me()
+    {
+        var name = User.Identity?.Name ?? User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        var claims = User.Claims.Select(c => new { Type = c.Type, Value = c.Value }).ToList();
+        var roles = User.FindAll(ClaimTypes.Role).Select(c => c.Value).ToList();
+        return Ok(new { Usuario = name, Claims = claims, Roles = roles });
     }
 
     // POST: api/auth/reveal-password
@@ -39,6 +51,13 @@ public class AuthController : ControllerBase
         if (user.Bloqueado == 1)
             return BadRequest(new { Exito = false, Mensaje = "Usuario bloqueado" });
 
+        // Obtener roles del usuario desde UsuarioRoles -> Role
+        var roleNames = await _context.UsuarioRoles
+            .Where(ur => ur.IdUsuario == user.IdUsuario)
+            .Include(ur => ur.IdRolNavigation)
+            .Select(ur => ur.IdRolNavigation.Nombre)
+            .ToListAsync();
+
         // Since passwords are stored as BCrypt hashes (one-way), we cannot decrypt. Generate a temporary password,
         // set it for the user, audit the action, and optionally send it by email.
         const string chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
@@ -56,6 +75,8 @@ public class AuthController : ControllerBase
 
         _context.UsuarioLogins.Update(user);
 
+        var rolesJoined = roleNames != null && roleNames.Count > 0 ? string.Join(", ", roleNames) : "(sin roles)";
+
         await _context.PasswordChangeAudits.AddAsync(new PasswordChangeAudit
         {
             IdUsuario = user.IdUsuario,
@@ -67,7 +88,7 @@ public class AuthController : ControllerBase
             UserAgent = Request.Headers["User-Agent"].ToString(),
             IntentosFallidos = user.IntentosFallidos,
             Bloqueado = false,
-            Observacion = "Se generó contraseña temporal por administrador"
+            Observacion = $"Se generó contraseña temporal por administrador. Roles asignados: {rolesJoined}"
         });
 
         await _context.SaveChangesAsync();
@@ -77,141 +98,13 @@ public class AuthController : ControllerBase
             var correo = user.CCorreo;
             var subject = "Contraseña temporal generada";
             var nombre = user.CDocumento;
-            var body = $"Su contraseña temporal es: {tempPassword}. Por favor cámbiela en su primer ingreso.";
+            var body = $"Su contraseña temporal es: {tempPassword}. Por favor cámbiela en su primer ingreso." +
+                       $"\nRoles asignados: {rolesJoined}";
             await _emailService.SendAsync(correo, subject, body);
         }
 
         // Do not return the stored hash. Return only a success message; temp password is sent by email.
-        return Ok(new { Exito = true, Mensaje = request.EnviarCorreo ? "Contraseña temporal enviada por correo" : "Contraseña temporal generada (no enviada)" });
-    }
-
-    [HttpPost("login")]
-        public async Task<IActionResult> Login([FromBody] LoginRequest request)
-    {
-        if (string.IsNullOrWhiteSpace(request.Documento) || string.IsNullOrWhiteSpace(request.Password))
-            return BadRequest("Documento y contraseña son obligatorios.");
-
-            var user = await _context.UsuarioLogins
-                .FirstOrDefaultAsync(u => u.CDocumento == request.Documento);
-
-            if (user == null)
-            {
-                // Registrar intento fallido para usuario inexistente
-                await _context.PasswordChangeAudits.AddAsync(new PasswordChangeAudit
-                {
-                    IdUsuario = null,
-                    IdPersona = null,
-                    Usuario = request.Documento,
-                    Exito = false,
-                    FechaAttempt = DateTime.UtcNow,
-                    Ip = HttpContext.Connection.RemoteIpAddress?.ToString(),
-                    UserAgent = Request.Headers["User-Agent"].ToString(),
-                    Observacion = "Usuario no existe"
-                });
-                await _context.SaveChangesAsync();
-
-                return Unauthorized("Credenciales inválidas.");
-            }
-
-            // Validar estado y bloqueo
-            if (user.Estado != 1 || user.Bloqueado == 1)
-            {
-                return Unauthorized("Usuario inactivo o bloqueado.");
-            }
-
-            // Verificar contraseña
-            if (!BCrypt.Net.BCrypt.Verify(request.Password, user.Password))
-            {
-                // Incrementar intentos fallidos
-                user.IntentosFallidos = (user.IntentosFallidos ?? 0) + 1;
-
-                // Determinar si se bloquea
-                var bloqueado = false;
-                if (user.IntentosFallidos >= 3)
-                {
-                    user.Bloqueado = 1;
-                    user.FechaBloqueo = int.Parse(DateTime.UtcNow.ToString("yyyyMMdd"));
-                    bloqueado = true;
-                }
-
-                _context.UsuarioLogins.Update(user);
-
-                // Registrar auditoría de login fallido
-                await _context.PasswordChangeAudits.AddAsync(new PasswordChangeAudit
-                {
-                    IdUsuario = user.IdUsuario,
-                    IdPersona = user.IdPersona,
-                    Usuario = user.CDocumento,
-                    Exito = false,
-                    FechaAttempt = DateTime.UtcNow,
-                    Ip = HttpContext.Connection.RemoteIpAddress?.ToString(),
-                    UserAgent = Request.Headers["User-Agent"].ToString(),
-                    IntentosFallidos = user.IntentosFallidos,
-                    Bloqueado = bloqueado,
-                    FechaBloqueo = bloqueado ? DateTime.UtcNow : (DateTime?)null,
-                    MotivoBloqueo = bloqueado ? "Tres intentos fallidos" : null,
-                    Observacion = "Credenciales inválidas"
-                });
-
-                await _context.SaveChangesAsync();
-
-                return Unauthorized("Credenciales inválidas.");
-            }
-
-            // Credenciales correctas: si la contraseña temporal existe validar expiración
-            if (user.BContrasenaTemporal == true)
-            {
-                var fechaTemp = user.DFechaContrasenaTemporal;
-                if (!fechaTemp.HasValue || DateTime.UtcNow > fechaTemp.Value.AddHours(12))
-                {
-                    // registrar auditoría de intento con contraseña temporal expirada
-                    await _context.PasswordChangeAudits.AddAsync(new PasswordChangeAudit
-                    {
-                        IdUsuario = user.IdUsuario,
-                        IdPersona = user.IdPersona,
-                        Usuario = user.CDocumento,
-                        Exito = false,
-                        FechaAttempt = DateTime.UtcNow,
-                        Ip = HttpContext.Connection.RemoteIpAddress?.ToString(),
-                        UserAgent = Request.Headers["User-Agent"].ToString(),
-                        Observacion = "Contraseña temporal expirada"
-                    });
-                    await _context.SaveChangesAsync();
-
-                    return Unauthorized(new { Exito = false, Mensaje = "Contraseña temporal expirada. Solicite una nueva contraseña temporal." });
-                }
-            }
-
-            // Credenciales correctas: actualizar UltimoLogin y resetear intentos fallidos
-            user.UltimoLogin = DateTime.UtcNow;
-            // si la contraseña es temporal y el usuario ingresó con la temporal, dejamos BContrasenaTemporal = true hasta que cambie la contraseña
-            user.IntentosFallidos = 0;
-            _context.UsuarioLogins.Update(user);
-
-            // Registrar auditoría de login exitoso
-            await _context.PasswordChangeAudits.AddAsync(new PasswordChangeAudit
-            {
-                IdUsuario = user.IdUsuario,
-                IdPersona = user.IdPersona,
-                Usuario = user.CDocumento,
-                Exito = true,
-                FechaAttempt = DateTime.UtcNow,
-                Ip = HttpContext.Connection.RemoteIpAddress?.ToString(),
-                UserAgent = Request.Headers["User-Agent"].ToString(),
-                IntentosFallidos = user.IntentosFallidos,
-                Bloqueado = false,
-                Observacion = "Login exitoso"
-            });
-
-            await _context.SaveChangesAsync();
-
-            // Devolver el IdPersona (código del cliente) siempre con la misma estructura
-            var isTemp = user.BContrasenaTemporal == true;
-            var mensaje = isTemp
-                ? "La contraseña es temporal. El usuario debe cambiarla dentro de las 12 horas."
-                : "Usuario autenticado";
-
-            return Ok(new { codigoCliente = user.IdPersona, PasswordTemporal = isTemp, Mensaje = mensaje });
+        return Ok(new { Exito = true, Mensaje = request.EnviarCorreo ? "Contraseña temporal enviada por correo" : "Contraseña temporal generada (no enviada)", Roles = roleNames });
     }
 
     [HttpPost("change-password")]
