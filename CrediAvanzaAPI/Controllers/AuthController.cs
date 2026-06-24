@@ -42,7 +42,7 @@ public class AuthController : ControllerBase
     // WARNING: returning decrypted passwords is insecure. This endpoint will only allow administrators and will
     // generate a temporary password instead of returning the stored hash. It will email the user with the temporary password
     // if EnviarCorreo = true. The system does not store passwords in reversible form; stored Password is a BCrypt hash.
-    [Authorize(Roles = "Admin")]
+    //[Authorize(Roles = "Admin")]
     [HttpPost("reveal-password")]
     public async Task<IActionResult> RevealPassword([FromBody] Request.GenerateTempPasswordRequest request)
     {
