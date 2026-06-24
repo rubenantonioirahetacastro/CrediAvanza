@@ -18,28 +18,22 @@
 
                 <p>
                     Actualmente, su solicitud se encuentra en proceso de análisis por parte de nuestro equipo de evaluación,
-                    quien revisará la información proporcionada para determinar la aprobación correspondiente.
+                    quien revisará la información proporcionada para determinar la aprobación.
                 </p>
 
                 <p>
                     Como parte del proceso, hemos generado sus credenciales de acceso al sistema:
                 </p>
+                <p><b>Usuario:</b> su número de documento de identidad registrado.</p>
 
                 <p><b>Contraseña temporal:</b></p>
                 <h2 style='color:#000000'>{passwordTemporal}</h2>
 
-                <p>
-                    El usuario para iniciar sesión en la plataforma corresponde a su número de documento registrado.
-                </p>
+               
 
                 <p>
                     Le recomendamos ingresar a la plataforma con esta contraseña y proceder a su cambio inmediato
                     por motivos de seguridad.
-                </p>
-
-                <p>
-                    En caso de requerir información adicional, uno de nuestros asesores se pondrá en contacto con usted
-                    en los próximos días hábiles para dar seguimiento a su solicitud.
                 </p>
 
                 <p>
