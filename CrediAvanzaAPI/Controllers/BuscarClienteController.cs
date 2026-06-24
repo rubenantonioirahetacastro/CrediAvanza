@@ -37,8 +37,6 @@ namespace CrediAvanzaAPI.Controllers
             return Ok(existe ? 1 : 0);
         }
 
-        //Endpoind 
-
         [HttpGet("porid/{idPersona}")]
         public async Task<IActionResult> GetClientePorId(int idPersona)
         {
@@ -93,4 +91,3 @@ namespace CrediAvanzaAPI.Controllers
         }
     }
 }
-//Enpoind 
