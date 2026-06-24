@@ -81,7 +81,8 @@ namespace CrediAvanzaAPI.Services
                 var token = Random.Shared.Next(0, 1_000_000).ToString("D6");
                 var tokenInt = int.Parse(token);
 
-                await context.UsuarioLogins.AddAsync(new UsuarioLogin
+                // Add UsuarioLogin for the persona
+                var usuario = new UsuarioLogin
                 {
                     CDocumento = persona.CDocumento,
                     IdPersona = persona.IdPersona,
@@ -93,7 +94,38 @@ namespace CrediAvanzaAPI.Services
                     IntentosFallidos = 0,
                     Bloqueado = 0,
                     TokenCheck = false
-                });
+                };
+
+                await context.UsuarioLogins.AddAsync(usuario);
+                // Save now to get IdUsuario assigned so we can create UsuarioRole
+                await context.SaveChangesAsync();
+
+                // Ensure default role 'Usuario' exists and assign to the new user
+                var defaultRoleName = "Usuario";
+                var defaultRoleDesc = "Usuario estándar";
+
+                var role = await context.Roles.FirstOrDefaultAsync(r => r.Nombre == defaultRoleName);
+                if (role == null)
+                {
+                    role = new Role
+                    {
+                        Nombre = defaultRoleName,
+                        Descripcion = defaultRoleDesc,
+                        Activo = true,
+                        FechaCreacion = DateTime.UtcNow
+                    };
+                    await context.Roles.AddAsync(role);
+                    await context.SaveChangesAsync();
+                }
+
+                var usuarioRole = new UsuarioRole
+                {
+                    IdUsuario = usuario.IdUsuario,
+                    IdRol = role.IdRol,
+                    FechaAsignacion = DateTime.UtcNow
+                };
+
+                await context.UsuarioRoles.AddAsync(usuarioRole);
 
                 var subject = "Solicitud de crédito recibida";
                 var nombre = string.IsNullOrWhiteSpace(persona.CNombres + ' ' + persona.CPrimerApellido)
