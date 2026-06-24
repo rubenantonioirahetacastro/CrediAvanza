@@ -30,4 +30,8 @@ public partial class UsuarioLogin
     public int? FechaBloqueo { get; set; }
 
     public DateTime? UltimoLogin { get; set; }
+
+    public bool? BContrasenaTemporal { get; set; }
+
+    public DateTime? DFechaContrasenaTemporal { get; set; }
 }

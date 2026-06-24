@@ -65,6 +65,8 @@ public partial class DbNegocioContext : DbContext
 
     public virtual DbSet<Negocio> Negocios { get; set; }
 
+    public virtual DbSet<PasswordChangeAudit> PasswordChangeAudits { get; set; }
+
     public virtual DbSet<Persona> Personas { get; set; }
 
     public virtual DbSet<UsuarioLogin> UsuarioLogins { get; set; }
@@ -598,6 +600,34 @@ public partial class DbNegocioContext : DbContext
             entity.Property(e => e.THoraInicio).HasColumnName("tHoraInicio");
         });
 
+        modelBuilder.Entity<PasswordChangeAudit>(entity =>
+        {
+            entity.HasKey(e => e.IdAudit).HasName("PK__Password__C87E13DD960906D2");
+
+            entity.HasIndex(e => e.FechaAttempt, "IX_PasswordChangeAudits_Fecha");
+
+            entity.HasIndex(e => e.IdUsuario, "IX_PasswordChangeAudits_IdUsuario");
+
+            entity.HasIndex(e => e.Usuario, "IX_PasswordChangeAudits_Usuario");
+
+            entity.Property(e => e.FechaAttempt).HasDefaultValueSql("(sysutcdatetime())");
+            entity.Property(e => e.Ip)
+                .HasMaxLength(45)
+                .IsUnicode(false);
+            entity.Property(e => e.MotivoBloqueo)
+                .HasMaxLength(250)
+                .IsUnicode(false);
+            entity.Property(e => e.Observacion)
+                .HasMaxLength(500)
+                .IsUnicode(false);
+            entity.Property(e => e.UserAgent)
+                .HasMaxLength(250)
+                .IsUnicode(false);
+            entity.Property(e => e.Usuario)
+                .HasMaxLength(100)
+                .IsUnicode(false);
+        });
+
         modelBuilder.Entity<Persona>(entity =>
         {
             entity.HasKey(e => e.IdPersona);
@@ -647,6 +677,7 @@ public partial class DbNegocioContext : DbContext
 
             entity.ToTable("UsuarioLogin");
 
+            entity.Property(e => e.BContrasenaTemporal).HasColumnName("bContrasenaTemporal");
             entity.Property(e => e.CCorreo)
                 .HasMaxLength(50)
                 .IsUnicode(false)
@@ -655,6 +686,9 @@ public partial class DbNegocioContext : DbContext
                 .HasMaxLength(50)
                 .IsUnicode(false)
                 .HasColumnName("cDocumento");
+            entity.Property(e => e.DFechaContrasenaTemporal)
+                .HasColumnType("datetime")
+                .HasColumnName("dFechaContrasenaTemporal");
             entity.Property(e => e.Password)
                 .HasMaxLength(250)
                 .IsUnicode(false);
