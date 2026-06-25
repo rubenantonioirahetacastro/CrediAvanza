@@ -361,7 +361,8 @@ public class AuthController : ControllerBase
             });
             await _context.SaveChangesAsync();
 
-            return Forbid();
+            // Return a clear unauthorized message when the user has no allowed role
+            return Unauthorized(new { Exito = false, Mensaje = "Usuario no tiene rol asignado o rol no permitido." });
         }
 
         var jwtKey = _config["Jwt:Key"] ?? "ChangeThisSecretInProduction_ReplaceMeWithStrongKey";
