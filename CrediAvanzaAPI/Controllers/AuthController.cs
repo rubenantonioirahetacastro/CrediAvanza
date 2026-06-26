@@ -395,6 +395,10 @@ public class AuthController : ControllerBase
 
         await _context.SaveChangesAsync();
 
-        return Ok(new { Exito = true, Mensaje = "Autenticación exitosa", Token = tokenString, bTemporal = user.BContrasenaTemporal });
+        return Ok(new { Exito = true, 
+                        Mensaje = "Autenticación exitosa", 
+                        Token = tokenString, 
+                        IdPersona = user.IdPersona, 
+                        bTemporal = user.BContrasenaTemporal });
     }
 }
