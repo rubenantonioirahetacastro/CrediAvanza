@@ -108,7 +108,7 @@ namespace CrediAvanzaAPI.Controllers
                         p.IdPersona,
                         p.CNombres,
                         p.CDocumento,
-                        CCorreo = u.CCorreo,
+                        p.CCorreo,
                         NTelefono = (p.NTelefono != 0 ? p.NTelefono.ToString() : p.NCelular.ToString())
                     }
                 ).FirstOrDefaultAsync();
