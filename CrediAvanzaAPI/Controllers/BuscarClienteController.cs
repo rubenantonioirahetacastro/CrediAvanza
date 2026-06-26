@@ -89,5 +89,39 @@ namespace CrediAvanzaAPI.Controllers
                 return StatusCode(500, "Ocurrió un error al procesar la solicitud.");
             }
         }
+
+        [HttpGet("usuarioestandar/{idPersona}")]
+        public async Task<IActionResult> GetDatosHomeUsuarioPorId(int idPersona)
+        {
+            try
+            {
+                if (idPersona <= 0) return BadRequest("IdPersona inválido.");
+
+                var usuario = await (
+                    from p in _context.Personas.AsNoTracking()
+                    join u in _context.UsuarioLogins.AsNoTracking() on p.IdPersona equals u.IdPersona
+                    join ur in _context.UsuarioRoles.AsNoTracking() on u.IdUsuario equals ur.IdUsuario
+                    join r in _context.Roles.AsNoTracking() on ur.IdRol equals r.IdRol
+                    where p.IdPersona == idPersona && r.Nombre == "Usuario estandar"
+                    select new
+                    {
+                        p.IdPersona,
+                        p.CNombres,
+                        p.CDocumento,
+                        CCorreo = u.CCorreo,
+                        NTelefono = (p.NTelefono != 0 ? p.NTelefono.ToString() : p.NCelular.ToString())
+                    }
+                ).FirstOrDefaultAsync();
+
+                if (usuario == null) return NotFound($"Persona {idPersona} no encontrada o rol no permitido.");
+
+                return Ok(usuario);
+            }
+            catch (Exception ex)
+            {
+                await _errorLogger.LogAsync(ex);
+                return StatusCode(500, "Ocurrió un error al procesar la solicitud.");
+            }
+        }
     }
 }
