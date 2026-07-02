@@ -37,7 +37,7 @@ namespace CrediAvanzaAPI.Controllers
             return Ok(existe ? 1 : 0);
         }
 
-        [HttpGet("porid/{idPersona}")]
+        [HttpGet("GetClientePorId/{idPersona}")]
         public async Task<IActionResult> GetClientePorId(int idPersona)
         {
             try
@@ -90,7 +90,7 @@ namespace CrediAvanzaAPI.Controllers
             }
         }
 
-        [HttpGet("usuarioestandar/{idPersona}")]
+        [HttpGet("GetUsuarioPorId/{idPersona}")]
         public async Task<IActionResult> GetDatosHomeUsuarioPorId(int idPersona)
         {
             try
@@ -102,7 +102,7 @@ namespace CrediAvanzaAPI.Controllers
                     join u in _context.UsuarioLogins.AsNoTracking() on p.IdPersona equals u.IdPersona
                     join ur in _context.UsuarioRoles.AsNoTracking() on u.IdUsuario equals ur.IdUsuario
                     join r in _context.Roles.AsNoTracking() on ur.IdRol equals r.IdRol
-                    where p.IdPersona == idPersona && r.Nombre == "Usuario estandar"
+                    where p.IdPersona == idPersona && r.Nombre == "Usuario"
                     select new
                     {
                         p.IdPersona,
