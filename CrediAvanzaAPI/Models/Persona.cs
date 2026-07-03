@@ -43,7 +43,7 @@ public partial class Persona
 
     public string? CCorreo { get; set; }
 
-    public int NTelefono { get; set; }
+    public string CTelefono { get; set; } = null!;
 
-    public int NCelular { get; set; }
+    public string CCelular { get; set; } = null!;
 }

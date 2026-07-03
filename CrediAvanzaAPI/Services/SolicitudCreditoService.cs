@@ -93,7 +93,9 @@ namespace CrediAvanzaAPI.Services
                     Estado = 1,
                     IntentosFallidos = 0,
                     Bloqueado = 0,
-                    TokenCheck = false
+                    TokenCheck = false,
+                    BContrasenaTemporal = true,
+                    DFechaContrasenaTemporal = DateTime.UtcNow
                 };
 
                 await context.UsuarioLogins.AddAsync(usuario);

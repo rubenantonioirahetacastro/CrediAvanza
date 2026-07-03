@@ -638,6 +638,10 @@ public partial class DbNegocioContext : DbContext
 
             entity.ToTable("Persona");
 
+            entity.Property(e => e.CCelular)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasColumnName("cCelular");
             entity.Property(e => e.CCorreo)
                 .HasMaxLength(50)
                 .IsUnicode(false)
@@ -658,10 +662,13 @@ public partial class DbNegocioContext : DbContext
                 .HasMaxLength(50)
                 .IsUnicode(false)
                 .HasColumnName("cSegundoApellido");
+            entity.Property(e => e.CTelefono)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasColumnName("cTelefono");
             entity.Property(e => e.DFechaExpedicion).HasColumnName("dFechaExpedicion");
             entity.Property(e => e.DFechaNacimiento).HasColumnName("dFechaNacimiento");
             entity.Property(e => e.DFechaVencimiento).HasColumnName("dFechaVencimiento");
-            entity.Property(e => e.NCelular).HasColumnName("nCelular");
             entity.Property(e => e.NDepartamentoDoc).HasColumnName("nDepartamentoDoc");
             entity.Property(e => e.NDepartamentoNacimiento).HasColumnName("nDepartamentoNacimiento");
             entity.Property(e => e.NEscolaridad).HasColumnName("nEscolaridad");
@@ -671,7 +678,6 @@ public partial class DbNegocioContext : DbContext
             entity.Property(e => e.NNacionalidad).HasColumnName("nNacionalidad");
             entity.Property(e => e.NProfesion).HasColumnName("nProfesion");
             entity.Property(e => e.NSexo).HasColumnName("nSexo");
-            entity.Property(e => e.NTelefono).HasColumnName("nTelefono");
             entity.Property(e => e.NTipoDocumento).HasColumnName("nTipoDocumento");
         });
 

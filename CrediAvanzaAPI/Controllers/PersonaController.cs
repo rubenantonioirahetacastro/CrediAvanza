@@ -46,8 +46,8 @@ public class PersonaController : ControllerBase
         existing.NProfesion = persona.NProfesion;
         existing.NEscolaridad = persona.NEscolaridad;
         existing.CCorreo = persona.CCorreo;
-        existing.NTelefono = persona.NTelefono;
-        existing.NCelular = persona.NCelular;
+        existing.CTelefono = persona.CTelefono;
+        existing.CCelular = persona.CCelular;
 
         _context.Personas.Update(existing);
         await _context.SaveChangesAsync();
