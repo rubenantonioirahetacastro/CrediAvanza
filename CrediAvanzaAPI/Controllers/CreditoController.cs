@@ -64,9 +64,10 @@ namespace CrediAvanzaAPI.Controllers
                 .OrderBy(x => x.NNroCuota)
                 .FirstOrDefault();
 
-            var catalogoEstados = await _catalogoCodigoService.GetCatalogoById(116);
-            var estado = catalogoEstados.FirstOrDefault(x => x.NValor == credito.NEstado)?.CNomCod
-                ?? credito.NEstado.ToString();
+            var estado = await _context.CatalogoCodigos
+                .Where(x => x.NCodigo == 116 && x.NValor == credito.NEstado)
+                .Select(x => x.CNomCod)
+                .FirstOrDefaultAsync();
 
 
             return new

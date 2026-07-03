@@ -49,7 +49,7 @@ namespace CrediAvanzaAPI.Services
             // Obtener condiciones de calendario para el crédito
             var calendarioCond = await _context.CredCalendConds
                 .FirstOrDefaultAsync(cc => cc.IdCredCalendCond == credito.IdCredCalendCond)
-                ?? throw new Exception("Condiciones de calendario no encontradas");
+                    ?? throw new Exception("Condiciones de calendario no encontradas");
 
             calendarioCond.NNroCalen += 1;
 
