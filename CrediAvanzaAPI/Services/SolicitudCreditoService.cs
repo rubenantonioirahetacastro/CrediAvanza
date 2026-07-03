@@ -9,7 +9,8 @@ namespace CrediAvanzaAPI.Services
     public class SolicitudCreditoService(
         DbNegocioContext context,
         ErrorLogger errorLogger,
-        IEmailService emailService) : ISolicitudCreditoService
+        IEmailService emailService,
+        ICalendarioService calendarioService) : ISolicitudCreditoService
     {
         public async Task<int> CrearSolicitudAsync(
             List<FotoId>? fotoId,
@@ -129,6 +130,12 @@ namespace CrediAvanzaAPI.Services
 
                 await context.UsuarioRoles.AddAsync(usuarioRole);
 
+                await context.Creditos.AddAsync(credito);
+
+                int result = await context.SaveChangesAsync();
+
+                await calendarioService.GenerarCalendarioAsync(credito.NCodAge, credito.NCodCred);
+
                 var subject = "Solicitud de crédito recibida";
                 var nombre = string.IsNullOrWhiteSpace(persona.CNombres + ' ' + persona.CPrimerApellido)
                     ? persona.CDocumento
@@ -136,11 +143,6 @@ namespace CrediAvanzaAPI.Services
                 var body = EmailTemplates.SolicitudCredito(nombre, tokenInt, passwordTemporal);
 
                 await emailService.SendAsync(correo, subject, body);
-
-
-                await context.Creditos.AddAsync(credito);
-
-                int result = await context.SaveChangesAsync();
 
                 await tx.CommitAsync();
 
