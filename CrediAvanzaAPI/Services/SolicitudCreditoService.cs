@@ -45,6 +45,26 @@ namespace CrediAvanzaAPI.Services
 
                 await context.SaveChangesAsync();
 
+                if (!credito.IdCredCalendCond.HasValue)
+                {
+                    var calendarioCond = new CredCalendCond
+                    {
+                        NDiaFijo = 1,
+                        NCuotas = credito.NNroCuotas,
+                        NPlazo = credito.NPeriodo,
+                        NNroCalen = 1,
+                        BCobroSab = true,
+                        BCobroDom = false,
+                        BCobroFer = false,
+                        BCuotaDoble = false,
+                        IdCalenGasto = 1
+                    };
+
+                    await context.CredCalendConds.AddAsync(calendarioCond);
+                    await context.SaveChangesAsync();
+                    credito.IdCredCalendCond = calendarioCond.IdCredCalendCond;
+                }
+
                 compra?.ForEach(x => x.IdNegocio = negocio!.IdNegocio);
                 venta?.ForEach(x => x.IdNegocio = negocio!.IdNegocio);
 
