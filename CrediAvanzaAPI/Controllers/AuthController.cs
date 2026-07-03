@@ -399,6 +399,6 @@ public class AuthController : ControllerBase
                         Mensaje = "Autenticación exitosa", 
                         Token = tokenString, 
                         IdPersona = user.IdPersona, 
-                        bTemporal = user.BContrasenaTemporal });
+                        bTemporal = user.BContrasenaTemporal == true });
     }
 }
