@@ -57,16 +57,16 @@ public class PersonaController : ControllerBase
 
     // PUT: api/persona/{id}/contacto
     [HttpPut("{id}/contacto")]
-    public async Task<IActionResult> UpdatePersonaContacto(int id, [FromBody] Persona persona)
+    public async Task<IActionResult> UpdatePersonaContacto(int id, [FromBody] UpdatePersonaContactoRequest contacto)
     {
-        if (persona == null) return BadRequest("No se pudo completar la actualización porque el cuerpo de la solicitud es nulo");
+        if (contacto == null) return BadRequest("No se pudo completar la actualización porque el cuerpo de la solicitud es nulo");
 
         var existing = await _context.Personas.FindAsync(id);
         if (existing == null) return NotFound($"Persona {id} no existe en la base de datos");
 
-        existing.CCorreo = persona.CCorreo;
-        existing.CTelefono = persona.CTelefono;
-        existing.CCelular = persona.CCelular;
+        existing.CCorreo = contacto.CCorreo;
+        existing.CTelefono = contacto.CTelefono;
+        existing.CCelular = contacto.CCelular;
 
         _context.Personas.Update(existing);
         await _context.SaveChangesAsync();
@@ -74,3 +74,5 @@ public class PersonaController : ControllerBase
         return Ok("Datos de contacto actualizados correctamente");
     }
 }
+
+public sealed record UpdatePersonaContactoRequest(string? CCorreo, string CTelefono, string CCelular);
