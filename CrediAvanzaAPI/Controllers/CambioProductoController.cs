@@ -1,8 +1,6 @@
 using CrediAvanzaAPI.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace CrediAvanzaAPI.Controllers
 {
@@ -18,26 +16,42 @@ namespace CrediAvanzaAPI.Controllers
         }
 
         // GET api/CambioProducto/1
-        [HttpGet("{nProd}")]
-        public async Task<IActionResult> GetOpcionesCambioProducto(int nProd)
+        [HttpGet("{nSubProd}")]
+        public async Task<IActionResult> GetCambioProducto(int nSubProd)
         {
-            if (nProd <= 0) return BadRequest("El código de producto (nProd) debe ser mayor a 0.");
+            if (nSubProd <= 0)
+                return BadRequest("El código de subproducto (nSubProd) debe ser mayor a 0.");
 
-            var opciones = await _context.CredLineaCreditos
-                .AsNoTracking()
-                .Where(l => l.NProd == nProd && l.BEstado)
-                .OrderBy(l => l.NSubProd)
-                .Select(l => new
+            var opciones = await (
+                from lca in _context.LineaCatalogoAuxiliars.AsNoTracking()
+                join cl in _context.CredLineaCreditos.AsNoTracking()
+                    on new { NProd = lca.NProd, NSubProd = lca.NSubProd }
+                    equals new { NProd = (int?)cl.NProd, NSubProd = (int?)cl.NSubProd }
+                where lca.NProd == 1
+                    && lca.NSubProd == nSubProd
+                    && lca.NCatalogoCodigo.HasValue
+                    && cl.BEstado
+                orderby cl.NPlazoMin, cl.NPlazoMax
+                select new
                 {
-                    Subproducto = l.NSubProd,
-                    Montomin = l.NMontoMin,
-                    MontoMax = l.NMontoMax,
-                    CatalogoCouta = l.NCodLinea
+                    MontoMin = cl.NMontoMin,
+                    MontoMax = cl.NMontoMax,
+                    PlazoMin = cl.NPlazoMin,
+                    PlazoMax = cl.NPlazoMax,
+                    NumeroCatalogo = lca.NCatalogoCodigo,
+                    LineaCredito = cl.NCodLinea,
+                    Periodicidad = cl.Periodicidad
                 })
                 .ToListAsync();
 
             if (opciones == null || opciones.Count == 0)
-                return NotFound("No se encontraron opciones de cambio de producto para el producto proporcionado.");
+                return NotFound("No se encontraron opciones de cambio de producto para el subproducto proporcionado.");
+
+            //Meses → Cuotas
+            //Cuotas = PlazoMeses * Periodicidad
+
+            //Cuotas → Meses
+            //PlazoMeses = Cuotas / Periodicidad
 
             return Ok(opciones);
         }

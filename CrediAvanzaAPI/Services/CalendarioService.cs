@@ -68,12 +68,11 @@ namespace CrediAvanzaAPI.Services
             decimal saldo = credito.NSaldoK; // C: Monto del préstamo (o saldo actual)
 
             decimal tasaIva = 0.13m; // Tasa de IVA (ej. 13%)
-            int n = totalCuotas;
 
             // Delegar cálculo central a helper financiero para evitar duplicidad
-            decimal cuotaFijaEstimada = CalculadoraFinanciera.CalcularCuotaFijaEstimada(saldo, n, credito.NSubProd, tasaInteresMensual, tasaIva);
+            decimal cuotaFijaEstimada = CalculadoraFinanciera.CalcularCuotaFijaEstimada(saldo, totalCuotas, credito.NSubProd, tasaInteresMensual, tasaIva);
 
-            var calendario = GenerarDetalleCuotas(saldo, n, credito.NSubProd, tasaInteresMensual, fecha, oFeriados, cuotaFijaEstimada, tasaIva, calendarioCond.NNroCalen, credito.NCodAge, credito.NCodCred);
+            var calendario = GenerarDetalleCuotas(saldo, totalCuotas, credito.NSubProd, tasaInteresMensual, fecha, oFeriados, cuotaFijaEstimada, tasaIva, calendarioCond.NNroCalen, credito.NCodAge, credito.NCodCred);
 
             await _context.Set<CredCalendario>().AddRangeAsync(calendario);
             await _context.SaveChangesAsync();

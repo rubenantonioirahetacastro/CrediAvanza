@@ -9,6 +9,7 @@ using System.Security.Claims;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Text;
+using System.Security.Cryptography;
 
 namespace CrediAvanzaAPI.Controllers;
 
@@ -19,12 +20,23 @@ public class AuthController : ControllerBase
     private readonly DbNegocioContext _context;
     private readonly IEmailService _emailService;
     private readonly IConfiguration _config;
+    private static readonly TimeSpan UnlockTokenExpiration = TimeSpan.FromMinutes(15);
 
     public AuthController(DbNegocioContext context, IEmailService emailService, IConfiguration config)
     {
         _context = context;
         _emailService = emailService;
         _config = config;
+    }
+
+    private static string GenerateUnlockToken()
+    {
+        return RandomNumberGenerator.GetInt32(0, 1_000_000).ToString("D6");
+    }
+
+    private static bool HasUsuarioRole(IEnumerable<string> roleNames)
+    {
+        return roleNames.Any(r => string.Equals(r, "Usuario", StringComparison.OrdinalIgnoreCase));
     }
 
     // Debug endpoint to inspect token claims and roles
@@ -219,6 +231,141 @@ public class AuthController : ControllerBase
             IntentosFallidos = user.IntentosFallidos,
             Bloqueado = false,
             Observacion = string.IsNullOrWhiteSpace(request.Observacion) ? "Usuario desbloqueado por administrador" : request.Observacion
+        });
+
+        await _context.SaveChangesAsync();
+
+        return Ok(new { Exito = true, Mensaje = "Usuario desbloqueado correctamente" });
+    }
+
+    // POST: api/auth/request-unlock-app
+    // Solicita un token de desbloqueo para usuarios con rol Usuario y lo envía al correo registrado.
+    [HttpPost("request-unlock-app")]
+    [AllowAnonymous]
+    public async Task<IActionResult> RequestUnlockFromApp([FromBody] Request.UnlockAppRequest request)
+    {
+        if (string.IsNullOrWhiteSpace(request.Usuario))
+            return BadRequest(new { Exito = false, Mensaje = "Usuario es requerido" });
+
+        var user = await _context.UsuarioLogins.FirstOrDefaultAsync(u => u.CDocumento == request.Usuario);
+        if (user == null)
+            return NotFound(new { Exito = false, Mensaje = "Usuario no existe" });
+
+        var roles = await _context.UsuarioRoles
+            .Where(ur => ur.IdUsuario == user.IdUsuario)
+            .Include(ur => ur.IdRolNavigation)
+            .Select(ur => ur.IdRolNavigation.Nombre)
+            .ToListAsync();
+
+        if (!HasUsuarioRole(roles))
+            return Unauthorized(new { Exito = false, Mensaje = "Solo los usuarios con rol Usuario pueden solicitar el desbloqueo desde la app." });
+
+        if (user.Bloqueado != 1)
+            return BadRequest(new { Exito = false, Mensaje = "El usuario no está bloqueado." });
+
+        if (string.IsNullOrWhiteSpace(user.CCorreo))
+            return BadRequest(new { Exito = false, Mensaje = "El usuario no tiene correo registrado para recibir el token." });
+
+        var token = GenerateUnlockToken();
+
+        user.Token = int.Parse(token);
+        user.TokenTime = DateTime.UtcNow;
+        user.TokenCheck = false;
+
+        _context.UsuarioLogins.Update(user);
+
+        await _context.PasswordChangeAudits.AddAsync(new PasswordChangeAudit
+        {
+            IdUsuario = user.IdUsuario,
+            IdPersona = user.IdPersona,
+            Usuario = user.CDocumento,
+            Exito = true,
+            FechaAttempt = DateTime.UtcNow,
+            Ip = HttpContext.Connection.RemoteIpAddress?.ToString(),
+            UserAgent = Request.Headers["User-Agent"].ToString(),
+            IntentosFallidos = user.IntentosFallidos,
+            Bloqueado = true,
+            Observacion = "Se generó token de desbloqueo desde la app"
+        });
+
+        await _context.SaveChangesAsync();
+
+        var subject = "Token de desbloqueo de cuenta";
+        var body = $"Estimado(a) usuario:\n\n" +
+                   $"Hemos generado un token para desbloquear su cuenta: {token}.\n" +
+                   $"Este código vence en {UnlockTokenExpiration.TotalMinutes:0} minutos.\n\n" +
+                   "Por favor, ingréselo en la aplicación para completar el proceso.";
+
+        await _emailService.SendAsync(user.CCorreo, subject, body);
+
+        return Ok(new { Exito = true, Mensaje = "Se envió un token de desbloqueo al correo registrado." });
+    }
+
+    // POST: api/auth/confirm-unlock-app
+    // Confirma el desbloqueo usando el token enviado por correo.
+    [HttpPost("confirm-unlock-app")]
+    [AllowAnonymous]
+    public async Task<IActionResult> ConfirmUnlockFromApp([FromBody] Request.ConfirmUnlockAppRequest request)
+    {
+        if (string.IsNullOrWhiteSpace(request.Usuario) || string.IsNullOrWhiteSpace(request.Token))
+            return BadRequest(new { Exito = false, Mensaje = "Usuario y Token son obligatorios" });
+
+        var user = await _context.UsuarioLogins.FirstOrDefaultAsync(u => u.CDocumento == request.Usuario);
+        if (user == null)
+            return NotFound(new { Exito = false, Mensaje = "Usuario no existe" });
+
+        var roles = await _context.UsuarioRoles
+            .Where(ur => ur.IdUsuario == user.IdUsuario)
+            .Include(ur => ur.IdRolNavigation)
+            .Select(ur => ur.IdRolNavigation.Nombre)
+            .ToListAsync();
+
+        if (!HasUsuarioRole(roles))
+            return Unauthorized(new { Exito = false, Mensaje = "Solo los usuarios con rol Usuario pueden usar este flujo." });
+
+        if (user.Bloqueado != 1)
+            return BadRequest(new { Exito = false, Mensaje = "El usuario no está bloqueado." });
+
+        if (user.Token == null || user.TokenTime == null)
+            return BadRequest(new { Exito = false, Mensaje = "No existe un token de desbloqueo vigente." });
+
+        if (user.TokenCheck == true)
+            return BadRequest(new { Exito = false, Mensaje = "El token ya fue utilizado." });
+
+        if (DateTime.UtcNow - user.TokenTime.Value > UnlockTokenExpiration)
+        {
+            user.Token = null;
+            user.TokenTime = null;
+            user.TokenCheck = null;
+            _context.UsuarioLogins.Update(user);
+            await _context.SaveChangesAsync();
+            return BadRequest(new { Exito = false, Mensaje = "El token de desbloqueo expiró." });
+        }
+
+        if (!int.TryParse(request.Token.Trim(), out var tokenIngresado) || tokenIngresado != user.Token.Value)
+            return BadRequest(new { Exito = false, Mensaje = "Token inválido" });
+
+        user.Bloqueado = 0;
+        user.IntentosFallidos = 0;
+        user.FechaBloqueo = null;
+        user.Token = null;
+        user.TokenTime = null;
+        user.TokenCheck = true;
+
+        _context.UsuarioLogins.Update(user);
+
+        await _context.PasswordChangeAudits.AddAsync(new PasswordChangeAudit
+        {
+            IdUsuario = user.IdUsuario,
+            IdPersona = user.IdPersona,
+            Usuario = user.CDocumento,
+            Exito = true,
+            FechaAttempt = DateTime.UtcNow,
+            Ip = HttpContext.Connection.RemoteIpAddress?.ToString(),
+            UserAgent = Request.Headers["User-Agent"].ToString(),
+            IntentosFallidos = user.IntentosFallidos,
+            Bloqueado = false,
+            Observacion = "Usuario desbloqueado desde la app con token válido"
         });
 
         await _context.SaveChangesAsync();

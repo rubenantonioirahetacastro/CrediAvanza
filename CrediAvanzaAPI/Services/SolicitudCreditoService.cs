@@ -68,26 +68,22 @@ namespace CrediAvanzaAPI.Services
                 credito.IdGarantia = garantia.IdGarantia;
                 credito.IdCapacidadPago = capacidadPago?.IdCapacidadPago;
 
-                if (!credito.IdCredCalendCond.HasValue || credito.IdCredCalendCond.Value <= 0)
+                var calendarioCond = new CredCalendCond
                 {
-                    var calendarioCond = new CredCalendCond
-                    {
-                        NDiaFijo = 1,
-                        NCuotas = credito.NNroCuotas,
-                        NPlazo = credito.NPeriodo,
-                        NNroCalen = 1,
-                        BCobroSab = true,
-                        BCobroDom = false,
-                        BCobroFer = false,
-                        BCuotaDoble = false,
-                        IdCalenGasto = 1
-                    };
+                    NDiaFijo = 1,
+                    NCuotas = credito.NNroCuotas,
+                    NPlazo = credito.NPeriodo,
+                    NNroCalen = 1,
+                    BCobroSab = true,
+                    BCobroDom = false,
+                    BCobroFer = false,
+                    BCuotaDoble = false,
+                    IdCalenGasto = 1
+                };
 
-                    await context.CredCalendConds.AddAsync(calendarioCond);
-                    await context.SaveChangesAsync();
-                    credito.IdCredCalendCond = calendarioCond.IdCredCalendCond;
-                }
-
+                await context.CredCalendConds.AddAsync(calendarioCond);
+                await context.SaveChangesAsync();
+                credito.IdCredCalendCond = calendarioCond.IdCredCalendCond;
 
                 var correo = string.IsNullOrWhiteSpace(persona.CCorreo)
                     ? $"{persona.CDocumento}@crediavanza.com"

@@ -59,6 +59,8 @@ public partial class DbNegocioContext : DbContext
 
     public virtual DbSet<Garantium> Garantia { get; set; }
 
+    public virtual DbSet<LineaCatalogoAuxiliar> LineaCatalogoAuxiliars { get; set; }
+
     public virtual DbSet<LogErrore> LogErrores { get; set; }
 
     public virtual DbSet<Municipio> Municipios { get; set; }
@@ -372,10 +374,14 @@ public partial class DbNegocioContext : DbContext
             entity.Property(e => e.BEstado)
                 .HasDefaultValue(true)
                 .HasColumnName("bEstado");
-            entity.Property(e => e.CDescLinea)
+            entity.Property(e => e.CDescripcion)
+                .HasMaxLength(400)
+                .IsUnicode(false)
+                .HasColumnName("cDescripcion");
+            entity.Property(e => e.CLinea)
                 .HasMaxLength(150)
                 .IsUnicode(false)
-                .HasColumnName("cDescLinea");
+                .HasColumnName("cLinea");
             entity.Property(e => e.NMontoMax)
                 .HasColumnType("money")
                 .HasColumnName("nMontoMax");
@@ -538,6 +544,21 @@ public partial class DbNegocioContext : DbContext
         modelBuilder.Entity<Garantium>(entity =>
         {
             entity.HasKey(e => e.IdGarantia);
+        });
+
+        modelBuilder.Entity<LineaCatalogoAuxiliar>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PK_LineaCreditosTemp");
+
+            entity.ToTable("LineaCatalogoAuxiliar");
+
+            entity.Property(e => e.CDescripcion)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasColumnName("cDescripcion");
+            entity.Property(e => e.NCatalogoCodigo).HasColumnName("nCatalogoCodigo");
+            entity.Property(e => e.NProd).HasColumnName("nProd");
+            entity.Property(e => e.NSubProd).HasColumnName("nSubProd");
         });
 
         modelBuilder.Entity<LogErrore>(entity =>

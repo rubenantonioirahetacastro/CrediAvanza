@@ -16,7 +16,7 @@ namespace CrediAvanzaAPI.Helpers
                     rAprox = (tasaInteresMensual * 12.0m / 360m) / 100.0m * 30m;
                     break;
                 case 5: // Catorcenal
-                    rAprox = rDiarioEstimacion * 14m;
+                    rAprox = rDiarioEstimacion * 15m;
                     break;
                 case 2: // Diario
                     rAprox = (tasaInteresMensual / (1m + tasaIva) / 100m * 12.0m / 360m) * 1m;

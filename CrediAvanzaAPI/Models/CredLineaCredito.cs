@@ -7,13 +7,15 @@ public partial class CredLineaCredito
 {
     public int NCodLinea { get; set; }
 
-    public string CDescLinea { get; set; } = null!;
+    public string CLinea { get; set; } = null!;
 
     public decimal NTasaCom { get; set; }
 
     public int NProd { get; set; }
 
     public int NSubProd { get; set; }
+
+    public int? Periodicidad { get; set; }
 
     public int NPlazoMin { get; set; }
 
@@ -24,4 +26,6 @@ public partial class CredLineaCredito
     public decimal NMontoMax { get; set; }
 
     public bool BEstado { get; set; }
+
+    public string? CDescripcion { get; set; }
 }
