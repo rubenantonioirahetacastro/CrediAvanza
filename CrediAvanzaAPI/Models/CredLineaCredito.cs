@@ -28,4 +28,6 @@ public partial class CredLineaCredito
     public bool BEstado { get; set; }
 
     public string? CDescripcion { get; set; }
+
+    public bool BAplicaSegmentacionUsura { get; set; }
 }

@@ -19,6 +19,8 @@ public partial class DbNegocioContext : DbContext
 
     public virtual DbSet<CapacidadPago> CapacidadPagos { get; set; }
 
+    public virtual DbSet<CatSegmentoUsura> CatSegmentoUsuras { get; set; }
+
     public virtual DbSet<CatalogoCodigo> CatalogoCodigos { get; set; }
 
     public virtual DbSet<Compra> Compras { get; set; }
@@ -72,6 +74,10 @@ public partial class DbNegocioContext : DbContext
     public virtual DbSet<Persona> Personas { get; set; }
 
     public virtual DbSet<Role> Roles { get; set; }
+
+    public virtual DbSet<SalarioMinimoVigente> SalarioMinimoVigentes { get; set; }
+
+    public virtual DbSet<TasaMaximaBcr> TasaMaximaBcrs { get; set; }
 
     public virtual DbSet<UsuarioLogin> UsuarioLogins { get; set; }
 
@@ -133,6 +139,30 @@ public partial class DbNegocioContext : DbContext
             entity.Property(e => e.DOtrosIngresos)
                 .HasColumnType("decimal(18, 2)")
                 .HasColumnName("dOtrosIngresos");
+        });
+
+        modelBuilder.Entity<CatSegmentoUsura>(entity =>
+        {
+            entity.HasKey(e => e.NCodSegmento).HasName("PK__CatSegme__70B6321C501B9212");
+
+            entity.ToTable("CatSegmentoUsura");
+
+            entity.Property(e => e.NCodSegmento)
+                .ValueGeneratedNever()
+                .HasColumnName("nCodSegmento");
+            entity.Property(e => e.BEstado)
+                .HasDefaultValue(true)
+                .HasColumnName("bEstado");
+            entity.Property(e => e.CDescripcion)
+                .HasMaxLength(100)
+                .IsUnicode(false)
+                .HasColumnName("cDescripcion");
+            entity.Property(e => e.NMultSmmax)
+                .HasColumnType("decimal(5, 2)")
+                .HasColumnName("nMultSMMax");
+            entity.Property(e => e.NMultSmmin)
+                .HasColumnType("decimal(5, 2)")
+                .HasColumnName("nMultSMMin");
         });
 
         modelBuilder.Entity<CatalogoCodigo>(entity =>
@@ -371,6 +401,9 @@ public partial class DbNegocioContext : DbContext
             entity.ToTable("CredLineaCredito");
 
             entity.Property(e => e.NCodLinea).HasColumnName("nCodLinea");
+            entity.Property(e => e.BAplicaSegmentacionUsura)
+                .HasDefaultValue(true)
+                .HasColumnName("bAplicaSegmentacionUsura");
             entity.Property(e => e.BEstado)
                 .HasDefaultValue(true)
                 .HasColumnName("bEstado");
@@ -718,6 +751,52 @@ public partial class DbNegocioContext : DbContext
             entity.Property(e => e.Nombre)
                 .HasMaxLength(50)
                 .IsUnicode(false);
+        });
+
+        modelBuilder.Entity<SalarioMinimoVigente>(entity =>
+        {
+            entity.HasKey(e => e.NCodSalMin).HasName("PK__SalarioM__24E830BDC3C7C532");
+
+            entity.ToTable("SalarioMinimoVigente");
+
+            entity.Property(e => e.NCodSalMin).HasColumnName("nCodSalMin");
+            entity.Property(e => e.BEstado)
+                .HasDefaultValue(true)
+                .HasColumnName("bEstado");
+            entity.Property(e => e.CSector)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasDefaultValue("Comercio y Servicios")
+                .HasColumnName("cSector");
+            entity.Property(e => e.DFecFin).HasColumnName("dFecFin");
+            entity.Property(e => e.DFecInicio).HasColumnName("dFecInicio");
+            entity.Property(e => e.NMontoMensual)
+                .HasColumnType("decimal(10, 2)")
+                .HasColumnName("nMontoMensual");
+        });
+
+        modelBuilder.Entity<TasaMaximaBcr>(entity =>
+        {
+            entity.HasKey(e => e.NCodTasaMax).HasName("PK__TasaMaxi__650D6D6E667849EF");
+
+            entity.ToTable("TasaMaximaBCR");
+
+            entity.Property(e => e.NCodTasaMax).HasColumnName("nCodTasaMax");
+            entity.Property(e => e.BEstado)
+                .HasDefaultValue(true)
+                .HasColumnName("bEstado");
+            entity.Property(e => e.DFecFin).HasColumnName("dFecFin");
+            entity.Property(e => e.DFecInicio).HasColumnName("dFecInicio");
+            entity.Property(e => e.DFecPublicacion).HasColumnName("dFecPublicacion");
+            entity.Property(e => e.NCodSegmento).HasColumnName("nCodSegmento");
+            entity.Property(e => e.NTasaMaxima)
+                .HasColumnType("decimal(7, 4)")
+                .HasColumnName("nTasaMaxima");
+
+            entity.HasOne(d => d.NCodSegmentoNavigation).WithMany(p => p.TasaMaximaBcrs)
+                .HasForeignKey(d => d.NCodSegmento)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK__TasaMaxim__nCodS__57A801BA");
         });
 
         modelBuilder.Entity<UsuarioLogin>(entity =>
