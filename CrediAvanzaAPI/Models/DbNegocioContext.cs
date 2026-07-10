@@ -321,6 +321,9 @@ public partial class DbNegocioContext : DbContext
             entity.Property(e => e.NTotalCuota)
                 .HasColumnType("money")
                 .HasColumnName("nTotalCuota");
+            entity.Property(e => e.Ngasto)
+                .HasColumnType("decimal(10, 2)")
+                .HasColumnName("NGasto");
         });
 
         modelBuilder.Entity<CredCambioGasto>(entity =>

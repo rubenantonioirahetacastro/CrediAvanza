@@ -38,4 +38,6 @@ public partial class CredCalendario
     public decimal? NTotalCuota { get; set; }
 
     public int NEstado { get; set; }
+
+    public decimal Ngasto { get; set; }
 }

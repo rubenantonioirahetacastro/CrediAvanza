@@ -10,7 +10,8 @@ namespace CrediAvanzaAPI.Services
         DbNegocioContext context,
         ErrorLogger errorLogger,
         IEmailService emailService,
-        ICalendarioService calendarioService) : ISolicitudCreditoService
+        ICalendarioService calendarioService,
+        ILineaCreditoService lineaCreditoService) : ISolicitudCreditoService
     {
         public async Task<int> CrearSolicitudAsync(
             List<FotoId>? fotoId,
@@ -26,6 +27,22 @@ namespace CrediAvanzaAPI.Services
             List<Venta>? venta,
             Credito credito)
         {
+            var solicitudExistente = await context.Personas
+                .AsNoTracking()
+                .AnyAsync(p => p.CDocumento == persona.CDocumento);
+
+            if (solicitudExistente)
+                throw new InvalidOperationException($"Ya existe una solicitud registrada para el documento {persona.CDocumento}.");
+
+            var lineaCredito = await lineaCreditoService.ResolverLineaCreditoAsync(credito.NSubProd, credito.NSaldoK);
+
+            if (credito.NNroCuotas < lineaCredito.NPlazoMin || credito.NNroCuotas > lineaCredito.NPlazoMax)
+                throw new InvalidOperationException(
+                    $"El plazo {credito.NNroCuotas} está fuera del rango permitido ({lineaCredito.NPlazoMin}-{lineaCredito.NPlazoMax}) para este producto.");
+
+            credito.NCodLinea = lineaCredito.NCodLinea;
+
+
             await using var tx = await context.Database.BeginTransactionAsync();
 
             try
@@ -153,15 +170,22 @@ namespace CrediAvanzaAPI.Services
 
                 await calendarioService.GenerarCalendarioAsync(credito.NCodAge, credito.NCodCred);
 
+                await tx.CommitAsync();
+
                 var subject = "Solicitud de crédito recibida";
                 var nombre = string.IsNullOrWhiteSpace(persona.CNombres + ' ' + persona.CPrimerApellido)
                     ? persona.CDocumento
                     : persona.CNombres;
                 var body = EmailTemplates.SolicitudCredito(nombre, tokenInt, passwordTemporal);
 
-                await emailService.SendAsync(correo, subject, body);
-
-                await tx.CommitAsync();
+                try
+                {
+                    await emailService.SendAsync(correo, subject, body);
+                }
+                catch (Exception ex)
+                {
+                    await errorLogger.LogAsync(ex);
+                }
 
                 return result;
             }

@@ -34,6 +34,9 @@ builder.Services.AddScoped<IGastoService, GastoService>();
 builder.Services.AddScoped<IAgenciaService, AgenciaService>();
 builder.Services.AddScoped<IPagoService, PagoService>();
 builder.Services.AddScoped<IEmailService, SmtpEmailService>();
+builder.Services.AddScoped<ISegmentoUsuraService, SegmentoUsuraService>();
+builder.Services.AddScoped<ILineaCreditoService, LineaCreditoService>();
+builder.Services.AddScoped<ISimulacionCalendarioService, SimulacionCalendarioService>();
 builder.Services.AddScoped<ErrorLogger>();
 
 builder.Services.AddApplicationInsightsTelemetry(options =>
