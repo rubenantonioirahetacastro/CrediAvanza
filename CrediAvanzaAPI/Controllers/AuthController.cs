@@ -486,9 +486,12 @@ public class AuthController : ControllerBase
             new Claim("IdPersona", user.IdPersona.ToString())
         };
 
-        var roles = await _context.UsuarioRoles.Where(ur => ur.IdUsuario == user.IdUsuario).Include(ur => ur.IdRolNavigation).Select(ur => ur.IdRolNavigation.Nombre).ToListAsync();
+        var rolesData = await _context.UsuarioRoles.Where(ur => ur.IdUsuario == user.IdUsuario).Include(ur => ur.IdRolNavigation).Select(ur => new { ur.IdRol, ur.IdRolNavigation.Nombre }).ToListAsync();
+        var roles = rolesData.Select(r => r.Nombre).ToList();
+        var idRol = rolesData.Select(r => r.IdRol).FirstOrDefault();
         // Only allow login for users with role 'Usuario' or 'Usuario estándar'
-        var allowedRoles = new[] { "Usuario", "Usuario estándar" };
+        var allowedRoles = new[] { "Usuario", "Usuario estándar", "Supervisor" };
+
         var hasAllowedRole = roles != null && roles.Any(r => allowedRoles.Contains(r));
         if (!hasAllowedRole)
         {
@@ -546,6 +549,7 @@ public class AuthController : ControllerBase
                         Mensaje = "Autenticación exitosa", 
                         Token = tokenString, 
                         IdPersona = user.IdPersona, 
-                        bTemporal = user.BContrasenaTemporal == true });
+                        bTemporal = user.BContrasenaTemporal == true,
+                        IdRol = idRol });
     }
 }
