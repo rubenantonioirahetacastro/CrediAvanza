@@ -140,5 +140,5 @@ app.Run();
 
 
 //Scaffold - DbContext "Server=DESKTOP-KTHL7K7\SQLEXPRESS;Database=DbNegocio;Trusted_Connection=True;MultipleActiveResultSets=true;TrustServerCertificate=True" Microsoft.EntityFrameworkCore.SqlServer - OutputDir Models - Context DbNegocioContext - Force
-//Server=tcp:crediavanza-server.database.windows.net,1433;Initial Catalog=DbNegocio;Persist Security Info=False;User ID=crediavanza;Password=Pepe1234;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;
-//Scaffold-DbContext "Server=tcp:crediavanza-server.database.windows.net,1433;Initial Catalog=DbNegocio;Persist Security Info=False;User ID=crediavanza;Password=Pepe1234;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;" Microsoft.EntityFrameworkCore.SqlServer -OutputDir Models -Context DbNegocioContext -Force
+//Server=tcp:crediavanza.database.windows.net,1433;Initial Catalog=DbNegocio;Persist Security Info=False;User ID=crediavanza;Password=Pepe1234;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;
+//Scaffold-DbContext "Server=tcp:crediavanza.database.windows.net,1433;Initial Catalog=DbNegocio;Persist Security Info=False;User ID=crediavanza;Password=Pepe1234;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;" Microsoft.EntityFrameworkCore.SqlServer -OutputDir Models -Context DbNegocioContext -Force
