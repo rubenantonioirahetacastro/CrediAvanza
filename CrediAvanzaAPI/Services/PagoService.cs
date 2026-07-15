@@ -51,7 +51,6 @@ namespace CrediAvanzaAPI.Services
             var lineaCredito = await _context.CredLineaCreditos
                 .FirstOrDefaultAsync(l => l.NCodLinea == credito.NCodLinea);
             decimal tasaInteresMensual = lineaCredito != null ? lineaCredito.NTasaCom : 0m;
-            decimal tasaIva = 0.13m;
 
             decimal montoRestante = request.MontoAbonado;
             DateTime fechaPago = DateTime.Now;
