@@ -34,7 +34,7 @@ namespace CrediAvanzaAPI.Services
             if (solicitudExistente)
                 throw new InvalidOperationException($"Ya existe una solicitud registrada para el documento {persona.CDocumento}.");
 
-            var lineaCredito = await lineaCreditoService.ResolverLineaCreditoAsync(credito.NSubProd, credito.NSaldoK);
+            var lineaCredito = await lineaCreditoService.ResolverLineaCreditoAsync(credito.NSubProd, credito.NPrestamo);
 
             if (credito.NNroCuotas < lineaCredito.NPlazoMin || credito.NNroCuotas > lineaCredito.NPlazoMax)
                 throw new InvalidOperationException(
